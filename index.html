@@ -10,6 +10,10 @@
     body {
       font-family: 'Space Grotesk', sans-serif;
       transition: background-color 0.3s, color 0.3s;
+      background: linear-gradient(-45deg, #1e1e2f, #1f3b4d, #2c5364, #1e202e);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #f0f0f0;
     }
     [data-theme="dark"] {
       background-color: #121212;
@@ -34,6 +38,11 @@
       animation: fadeIn 1s ease-in forwards;
       opacity: 0;
     }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     @keyframes fadeIn {
       to { opacity: 1; }
     }
@@ -43,9 +52,37 @@
       right: 20px;
       z-index: 999;
     }
+
+        /* Loader styles */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #121212;
+      z-index: 9999;
+      transition: opacity 0.8s ease;
+    }
+    body.loading #loader {
+      opacity: 1;
+    }
+    body.loaded #loader {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+
+
   </style>
 </head>
 <body class="container py-5 fade-in">
+
+    <!-- Loader -->
+  <div id="loader" class="d-flex justify-content-center align-items-center">
+    <h1 class="text-white">Loading...</h1>
+  </div>
+
 
   <button class="btn btn-sm btn-outline-secondary theme-toggle">🌓 Mode sombre</button>
 
@@ -55,7 +92,7 @@
 
     <!-- Typing effect section -->
     <h2 class="fw-light" style="height: 2.5rem;">
-      Je suis <span id="typewriter" class="text-primary"></span>
+      Je suis <span id="typewriter" class="text-white"></span>
     </h2>
   </div>
 
@@ -96,6 +133,16 @@
 
   <!-- JavaScript -->
   <script>
+    // Page loading effect
+  document.body.classList.add("loading");
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.body.classList.remove("loading");
+      document.body.classList.add("loaded");
+    }, 1500); // Adjust delay (in ms) here
+  });
+
+
     const toggleBtn = document.querySelector('.theme-toggle');
     toggleBtn.addEventListener('click', () => {
       const html = document.documentElement;
@@ -140,7 +187,7 @@
     }
 
     type();
-    
+
   </script>
 
 </body>

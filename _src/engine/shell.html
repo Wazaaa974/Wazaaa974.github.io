@@ -1,0 +1,138 @@
+
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#e7ecea; --panel:rgba(249,250,248,.93); --ink:#1b2420; --muted:#58675f; --line:rgba(27,36,32,.13);
+  --accent:#1d7a76; --accent-ink:#ffffff; --chip:#eef2f0; --shadow:0 8px 28px rgba(20,32,28,.16);
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; --sans:"Jost","Avenir Next","Century Gothic",system-ui,sans-serif;
+  --bar-h:64px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --bg:#111715; --panel:rgba(21,28,26,.9); --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.45); }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --bg:#111715; --panel:rgba(21,28,26,.9); --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.45); }
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{position:fixed;inset:0}
+#scene{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+#scene:active{cursor:grabbing}
+.card{position:absolute;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.id{top:calc(env(safe-area-inset-top,0px) + 16px);left:16px;padding:12px 14px;display:grid;gap:6px;max-width:min(300px,calc(100% - 190px))}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.id h1{margin:0;font-weight:600;font-size:30px;line-height:1;letter-spacing:.02em}
+.facts{display:flex;flex-wrap:wrap;gap:4px}
+.facts span{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--ink)}
+.where{display:flex;align-items:baseline;gap:8px;padding-top:6px;border-top:1px solid var(--line);font-weight:500;font-size:15px}
+.where .mono{font-size:12px;color:var(--muted)}
+.hsp{font-size:11px;color:var(--muted)}
+.src{font-size:10.5px;color:var(--muted);line-height:1.35}
+.map{top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;padding:8px}
+#mini{display:block;width:170px;height:104px;cursor:pointer}
+.bar{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);padding:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:max-content;max-width:calc(100% - 32px);box-sizing:border-box}
+.seg{display:flex;background:var(--chip);border-radius:9px;padding:3px;gap:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:7px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.chips{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;border:1px solid var(--line);background:transparent;padding:6px 10px;border-radius:999px;font-size:13px}
+.chips button.here{border-color:var(--accent);color:var(--accent)}
+.toggles{display:flex;gap:4px;flex-wrap:wrap}
+.tog{border:1px solid var(--line);background:transparent;padding:6px 10px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:6px}
+.tog::before{content:"";width:9px;height:9px;border-radius:3px;border:1.5px solid var(--muted)}
+.tog[aria-pressed="true"]::before{background:var(--accent);border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + var(--bar-h) + 26px);margin:0;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--muted);white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+#joy{position:absolute;left:24px;bottom:calc(env(safe-area-inset-bottom,0px) + var(--bar-h) + 60px);width:104px;height:104px;border-radius:50%;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);touch-action:none}
+#knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--accent);opacity:.9}
+@media (max-width:560px){
+  .id{padding:10px 12px;max-width:calc(100% - 170px)}
+  .id h1{font-size:24px}
+  .src{display:none}
+  #mini{width:128px;height:80px}
+  .bar{justify-content:center}
+}
+/* ---------- panneaux repliables (mobile) ---------- */
+.id{z-index:2;-webkit-tap-highlight-color:transparent}
+.bar button,.fold{-webkit-tap-highlight-color:transparent}
+.id-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.id-title{display:grid;gap:6px;min-width:0}
+.id-name{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.id-sub{display:none;font-size:12px;color:var(--muted)}
+.fold{flex:none;display:grid;place-items:center;width:30px;height:30px;margin:-2px -4px 0 0;padding:0;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted)}
+.fold svg{transition:transform .2s ease}
+.id.is-collapsed{padding:8px 8px 8px 12px;gap:3px;cursor:pointer}
+.id.is-collapsed .fold svg{transform:rotate(180deg)}
+.id.is-collapsed .eyebrow,.id.is-collapsed .facts,.id.is-collapsed .hsp,.id.is-collapsed .src{display:none}
+.id.is-collapsed h1{font-size:22px}
+.id.is-collapsed .id-sub{display:inline}
+.id.is-collapsed .where{padding-top:4px;font-size:13px;min-width:0}
+.id.is-collapsed .where span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.id.is-collapsed .where .mono{flex:none;max-width:45%}
+.opts{display:none;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;padding:7px 11px;border-radius:9px;font-size:13px;font-weight:500}
+.opts[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.hint{transition:opacity .4s ease}
+.hint.gone{opacity:0;pointer-events:none}
+@media (max-width:560px), (max-height:520px){
+  .opts{display:flex}
+  .bar:not(.opts-open) .toggles{display:none}
+  .toggles{width:100%}
+}
+@media (max-width:560px){
+  .id.is-collapsed{max-width:calc(100% - 32px - 156px)}
+  .id:not(.is-collapsed){max-width:calc(100% - 32px)}
+  .bar{width:calc(100% - 32px);padding:6px;gap:6px}
+  .bar > .seg{order:1}
+  .opts{order:2;margin-left:auto}
+  .chips{order:3;width:100%}
+  .toggles{order:4}
+  .hint{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app">
+  <canvas id="scene" tabindex="0" aria-label="Appartement {{NAME}} en 3D"></canvas>
+
+  <header class="card id" id="info">
+    <div class="id-top">
+      <div class="id-title">
+        <div class="eyebrow" id="mEye"></div>
+        <div class="id-name"><h1 id="mName"></h1><span class="id-sub mono" id="idSub"></span></div>
+      </div>
+      <button class="fold" id="infoToggle" type="button" aria-expanded="true" aria-controls="info" aria-label="Replier les informations"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 10 8 5.5 12.5 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="facts" id="mFacts"></div>
+    <div class="where"><span id="roomName">Vue d'ensemble</span><span id="roomArea" class="mono"></span></div>
+    <div id="hsp" class="hsp mono"></div>
+    <div class="src" id="mSrc"></div>
+  </header>
+
+  <aside class="card map" aria-label="Plan de situation"><canvas id="mini"></canvas></aside>
+
+  <div id="joy" hidden aria-hidden="true"><div id="knob"></div></div>
+  <p id="hint" class="hint">Glisse pour tourner · clic sur une porte pour l’ouvrir</p>
+
+  <nav id="bar" class="card bar" aria-label="Commandes">
+    <div class="seg">
+      <button id="bOrbit" aria-pressed="true">Maquette</button>
+      <button id="bVisit" aria-pressed="false">Visite</button>
+    </div>
+    <div id="chips" class="chips"></div>
+    <button id="bOpts" class="opts" type="button" aria-expanded="true" aria-controls="toggles"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.5" cy="4.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5.5" cy="11.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Options</button>
+    <div class="toggles" id="toggles">
+      <button id="tCeil" class="tog" aria-pressed="true" hidden>Plafond</button>
+      <button id="tPhoto" class="tog" aria-pressed="false">Mode photo</button>
+      <button id="tEve" class="tog" aria-pressed="false">Soir d’été</button>
+      <button id="tFurn" class="tog" aria-pressed="true">Meubles</button>
+      <button id="tSlide" class="tog" aria-pressed="true" title="Portes coulissantes suspendues pour la chambre et la salle d’eau">Portes coulissantes</button>
+      <div class="seg" role="group" aria-label="Cuisine" id="kitSeg"><button id="k0" aria-pressed="false">Sans cuisine</button><button id="kA" aria-pressed="true">Cuisine A</button><button id="kB" aria-pressed="false">B colonnes</button></div>
+    </div>
+  </nav>
+</div>
+

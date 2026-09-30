@@ -1,0 +1,17 @@
+{
+  "name": "cap-ouest-maquettes",
+  "private": true,
+  "type": "module",
+  "description": "Moteur unique des maquettes 3D + un relevé JSON par lot",
+  "scripts": { "build": "node tools/build.mjs" },
+  "dependencies": {
+    "three": "0.164.1",
+    "three-mesh-bvh": "0.7.8",
+    "three-gpu-pathtracer": "0.0.23"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "@fontsource/jost": "^5.0.0",
+    "@fontsource/ibm-plex-mono": "^5.0.0"
+  }
+}

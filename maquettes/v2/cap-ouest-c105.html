@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>C105 Cap Ouest</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="C105 Cap Ouest · maquette 3D">
+<meta property="og:description" content="T3 · 63,4 m² · R+1. Maquette 3D relevée sur le plan de vente : visite pièce par pièce, mode photo, soir d'été.">
+<meta property="og:url" content="https://wazaaa974.github.io/maquettes/v2/cap-ouest-c105.html">
+<meta property="og:image" content="https://wazaaa974.github.io/maquettes/v2/cap-ouest-c105.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#e7ecea; --panel:rgba(249,250,248,.93); --ink:#1b2420; --muted:#58675f; --line:rgba(27,36,32,.13);
+  --accent:#1d7a76; --accent-ink:#ffffff; --chip:#eef2f0; --shadow:0 8px 28px rgba(20,32,28,.16);
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; --sans:"Jost","Avenir Next","Century Gothic",system-ui,sans-serif;
+  --bar-h:64px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --bg:#111715; --panel:rgba(21,28,26,.9); --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.45); }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --bg:#111715; --panel:rgba(21,28,26,.9); --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.45); }
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{position:fixed;inset:0}
+#scene{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+#scene:active{cursor:grabbing}
+.card{position:absolute;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.id{top:calc(env(safe-area-inset-top,0px) + 16px);left:16px;padding:12px 14px;display:grid;gap:6px;max-width:min(300px,calc(100% - 190px))}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.id h1{margin:0;font-weight:600;font-size:30px;line-height:1;letter-spacing:.02em}
+.facts{display:flex;flex-wrap:wrap;gap:4px}
+.facts span{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--ink)}
+.where{display:flex;align-items:baseline;gap:8px;padding-top:6px;border-top:1px solid var(--line);font-weight:500;font-size:15px}
+.where .mono{font-size:12px;color:var(--muted)}
+.hsp{font-size:11px;color:var(--muted)}
+.src{font-size:10.5px;color:var(--muted);line-height:1.35}
+.map{top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;padding:8px}
+#mini{display:block;width:170px;height:104px;cursor:pointer}
+.bar{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);padding:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:max-content;max-width:calc(100% - 32px);box-sizing:border-box}
+.seg{display:flex;background:var(--chip);border-radius:9px;padding:3px;gap:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:7px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.chips{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;border:1px solid var(--line);background:transparent;padding:6px 10px;border-radius:999px;font-size:13px}
+.chips button.here{border-color:var(--accent);color:var(--accent)}
+.toggles{display:flex;gap:4px;flex-wrap:wrap}
+.tog{border:1px solid var(--line);background:transparent;padding:6px 10px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:6px}
+.tog::before{content:"";width:9px;height:9px;border-radius:3px;border:1.5px solid var(--muted)}
+.tog[aria-pressed="true"]::before{background:var(--accent);border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + var(--bar-h) + 26px);margin:0;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--muted);white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+#joy{position:absolute;left:24px;bottom:calc(env(safe-area-inset-bottom,0px) + var(--bar-h) + 60px);width:104px;height:104px;border-radius:50%;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);touch-action:none}
+#knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--accent);opacity:.9}
+@media (max-width:560px){
+  .id{padding:10px 12px;max-width:calc(100% - 170px)}
+  .id h1{font-size:24px}
+  .src{display:none}
+  #mini{width:128px;height:80px}
+  .bar{justify-content:center}
+}
+/* ---------- panneaux repliables (mobile) ---------- */
+.id{z-index:2;-webkit-tap-highlight-color:transparent}
+.bar button,.fold{-webkit-tap-highlight-color:transparent}
+.id-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.id-title{display:grid;gap:6px;min-width:0}
+.id-name{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.id-sub{display:none;font-size:12px;color:var(--muted)}
+.fold{flex:none;display:grid;place-items:center;width:30px;height:30px;margin:-2px -4px 0 0;padding:0;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted)}
+.fold svg{transition:transform .2s ease}
+.id.is-collapsed{padding:8px 8px 8px 12px;gap:3px;cursor:pointer}
+.id.is-collapsed .fold svg{transform:rotate(180deg)}
+.id.is-collapsed .eyebrow,.id.is-collapsed .facts,.id.is-collapsed .hsp,.id.is-collapsed .src{display:none}
+.id.is-collapsed h1{font-size:22px}
+.id.is-collapsed .id-sub{display:inline}
+.id.is-collapsed .where{padding-top:4px;font-size:13px;min-width:0}
+.id.is-collapsed .where span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.id.is-collapsed .where .mono{flex:none;max-width:45%}
+.opts{display:none;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;padding:7px 11px;border-radius:9px;font-size:13px;font-weight:500}
+.opts[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.hint{transition:opacity .4s ease}
+.hint.gone{opacity:0;pointer-events:none}
+@media (max-width:560px), (max-height:520px){
+  .opts{display:flex}
+  .bar:not(.opts-open) .toggles{display:none}
+  .toggles{width:100%}
+}
+@media (max-width:560px){
+  .id.is-collapsed{max-width:calc(100% - 32px - 156px)}
+  .id:not(.is-collapsed){max-width:calc(100% - 32px)}
+  .bar{width:calc(100% - 32px);padding:6px;gap:6px}
+  .bar > .seg{order:1}
+  .opts{order:2;margin-left:auto}
+  .chips{order:3;width:100%}
+  .toggles{order:4}
+  .hint{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app">
+  <canvas id="scene" tabindex="0" aria-label="Appartement C105 en 3D"></canvas>
+
+  <header class="card id" id="info">
+    <div class="id-top">
+      <div class="id-title">
+        <div class="eyebrow" id="mEye"></div>
+        <div class="id-name"><h1 id="mName"></h1><span class="id-sub mono" id="idSub"></span></div>
+      </div>
+      <button class="fold" id="infoToggle" type="button" aria-expanded="true" aria-controls="info" aria-label="Replier les informations"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 10 8 5.5 12.5 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="facts" id="mFacts"></div>
+    <div class="where"><span id="roomName">Vue d'ensemble</span><span id="roomArea" class="mono"></span></div>
+    <div id="hsp" class="hsp mono"></div>
+    <div class="src" id="mSrc"></div>
+  </header>
+
+  <aside class="card map" aria-label="Plan de situation"><canvas id="mini"></canvas></aside>
+
+  <div id="joy" hidden aria-hidden="true"><div id="knob"></div></div>
+  <p id="hint" class="hint">Glisse pour tourner · clic sur une porte pour l’ouvrir</p>
+
+  <nav id="bar" class="card bar" aria-label="Commandes">
+    <div class="seg">
+      <button id="bOrbit" aria-pressed="true">Maquette</button>
+      <button id="bVisit" aria-pressed="false">Visite</button>
+    </div>
+    <div id="chips" class="chips"></div>
+    <button id="bOpts" class="opts" type="button" aria-expanded="true" aria-controls="toggles"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.5" cy="4.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5.5" cy="11.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Options</button>
+    <div class="toggles" id="toggles">
+      <button id="tCeil" class="tog" aria-pressed="true" hidden>Plafond</button>
+      <button id="tPhoto" class="tog" aria-pressed="false">Mode photo</button>
+      <button id="tEve" class="tog" aria-pressed="false">Soir d’été</button>
+      <button id="tFurn" class="tog" aria-pressed="true">Meubles</button>
+      <button id="tSlide" class="tog" aria-pressed="true" title="Portes coulissantes suspendues pour la chambre et la salle d’eau">Portes coulissantes</button>
+      <div class="seg" role="group" aria-label="Cuisine" id="kitSeg"><button id="k0" aria-pressed="false">Sans cuisine</button><button id="kA" aria-pressed="true">Cuisine A</button><button id="kB" aria-pressed="false">B colonnes</button></div>
+    </div>
+  </nav>
+</div>
+<script>window.GEO = {"meta":{"name":"C105","eyebrow":"Cap Ouest · Carcans · Bât. C","facts":["T3","63,4 m²","R+1","nord · forêt"],"overview":"63,4 m² hab. + 11,4 m² ext.","src":"Relevé du plan de vente du 07/08/2025, écart < 1,5 cm sur les cotes. Meubles d’esprit bord de mer aux cotes standard : lits 160 × 200 et 140 × 190, table 140 × 80. Hauteur sous plafond supposée identique à l’A201 (2,50 m).","kitchenPrice":"5 352 € pour un T3 (book Teisseire)","building":"C","level":1,"type":"T3"},"ceiling":2.5,"soffitH":2.25,"soffits":[],"north":[1,0],"walls":[[1.246,0.245,2.858,0.481],[3.768,0.245,5.93,0.481],[6.832,0.245,9.4,0.481],[1.246,0.481,2.82,0.619],[3.806,0.481,5.885,0.619],[6.878,0.481,9.408,0.619],[1.246,0.619,1.429,3.462],[4.624,0.619,4.685,3.462],[9.033,0.619,9.408,3.462],[1.246,3.462,3.691,3.523],[5.617,3.462,9.408,3.523],[5.648,3.531,5.877,3.691],[5.816,3.691,5.877,4.715],[3.936,4.715,4.799,4.799],[5.686,4.715,5.877,4.799],[9.033,3.523,9.408,4.799],[9.171,4.799,9.408,4.853],[1.246,3.523,1.429,4.968],[2.881,4.463,2.95,4.968],[3.936,4.799,4.035,4.968],[1.246,4.968,2.996,5.029],[1.246,5.052,1.421,5.342],[2.056,5.052,2.14,5.342],[1.246,5.342,2.14,5.426],[3.936,5.029,4.02,6.962],[1.246,5.426,1.429,7.023],[3.936,6.962,4.669,7.031],[1.246,7.069,4.043,7.123],[9.171,7.237,9.4,7.291],[9.033,7.291,9.408,7.421],[1.246,7.138,1.421,7.459],[2.018,7.138,2.125,7.459],[1.246,7.459,2.125,7.566],[9.033,7.459,9.591,7.612],[10.462,7.421,11.823,7.612],[1.246,7.566,1.444,7.719],[3.936,7.123,4.043,7.795],[4.57,7.069,4.677,7.795],[0.061,7.719,1.437,7.803],[2.033,7.566,2.125,7.803],[0.061,7.803,1.467,7.902],[2.002,7.803,2.125,7.902],[3.065,7.123,3.149,7.902],[3.936,7.818,5.281,7.902],[0.061,7.902,0.245,8.101],[9.033,7.612,9.408,8.407],[11.632,7.612,11.823,8.407],[9.033,8.407,11.823,8.598],[9.033,8.598,9.408,9.14],[0.061,9.14,9.408,9.331],[4.585,3.462,4.723,3.523],[1.421,5.052,2.056,5.342],[1.429,7.138,2.018,7.459],[1.429,7.566,2.033,7.803],[4.043,7.031,4.57,7.795],[1.246,7.023,1.429,7.069]],"openings":[{"id":"f_ch2","type":"window","kind":"fav","r":[2.858,0.245,3.768,0.619],"head":2.15,"sill":0,"panes":[{"a":[2.858,0.394],"b":[3.768,0.394],"y0":0.02,"y1":1,"frost":true},{"a":[2.858,0.394],"b":[3.768,0.394],"y0":1,"y1":2.15,"frost":false}]},{"id":"f_ch1","type":"window","kind":"fav","r":[5.93,0.245,6.832,0.619],"head":2.15,"sill":0,"panes":[{"a":[5.93,0.394],"b":[6.832,0.394],"y0":0.02,"y1":1,"frost":true},{"a":[5.93,0.394],"b":[6.832,0.394],"y0":1,"y1":2.15,"frost":false}]},{"id":"pf","type":"window","kind":"pf","r":[9.033,4.853,9.408,7.237],"head":2.15,"sill":0,"panes":[{"a":[9.094,6.381],"b":[9.094,7.237],"y0":0.02,"y1":2.15,"frost":false}]},{"id":"entree","type":"door","kind":"door","r":[0.061,8.101,0.245,9.14],"head":2.04,"sill":0},{"id":"ch2","type":"door","kind":"door","r":[3.691,3.462,4.585,3.523],"head":2.04,"sill":0},{"id":"ch1","type":"door","kind":"door","r":[4.723,3.462,5.617,3.523],"head":2.04,"sill":0},{"id":"wc","type":"door","kind":"door","r":[2.881,3.523,2.95,4.463],"head":2.04,"sill":0},{"id":"sdb","type":"door","kind":"door","r":[2.996,4.968,3.936,5.029],"head":2.04,"sill":0},{"id":"dgt","type":"door","kind":"door","r":[4.799,4.715,5.686,4.799],"head":2.04,"sill":0},{"id":"becs","type":"door","kind":"door","r":[3.149,7.818,3.936,7.902],"head":2.04,"sill":0},{"id":"pl","type":"door","kind":"door","r":[2.125,7.818,3.065,7.902],"head":2.04,"sill":0},{"id":"cellier","type":"door","kind":"door","r":[9.591,7.421,10.462,7.612],"head":2.04,"sill":0}],"doors":[{"id":"entree","hinge":[0.153,9.11],"closed":[0.153,8.193],"open":[1.055,9.11],"isOpen":false,"kind":"entry"},{"id":"ch2","hinge":[4.555,3.493],"closed":[3.707,3.493],"open":[4.555,2.675],"isOpen":true,"kind":"door"},{"id":"ch1","hinge":[5.579,3.493],"closed":[4.738,3.493],"open":[5.579,4.31],"isOpen":true,"kind":"door"},{"id":"wc","hinge":[2.919,3.554],"closed":[2.919,4.394],"open":[2.102,3.554],"isOpen":false,"kind":"door"},{"id":"sdb","hinge":[3.042,4.998],"closed":[3.882,4.998],"open":[3.042,4.165],"isOpen":true,"kind":"door"},{"id":"dgt","hinge":[4.868,4.761],"closed":[5.655,4.761],"open":[4.868,5.541],"isOpen":true,"kind":"door"},{"id":"becs","hinge":[3.898,7.856],"closed":[3.179,7.856],"open":[3.898,8.621],"isOpen":false,"kind":"door"},{"id":"placard","hinge":[2.155,7.856],"closed":[3.042,7.856],"open":[2.155,8.712],"isOpen":false,"kind":"door"},{"id":"cellier","hinge":[9.629,7.512],"closed":[10.439,7.512],"open":[9.629,6.71],"isOpen":false,"kind":"door"},{"id":"pf1","hinge":[9.079,4.838],"closed":[9.079,5.609],"open":[8.307,4.838],"isOpen":true,"kind":"glass","pair":"pf","head":2.14},{"id":"pf2","hinge":[9.079,6.381],"closed":[9.079,5.625],"open":[8.307,6.381],"isOpen":true,"kind":"glass","pair":"pf","head":2.14}],"slides":[],"rooms":[{"name":"Séjour / Cuisine","plan":25.3,"floor":"vinyl","ext":false,"calc":25.27,"poly":[[5.877,3.523],[9.033,3.523],[9.033,9.14],[3.936,9.14],[3.936,7.902],[5.281,7.902],[5.281,7.818],[4.677,7.818],[4.677,7.031],[4.02,7.031],[4.02,4.799],[5.877,4.799]]},{"name":"Entrée","plan":6,"floor":"vinyl","ext":false,"calc":5.98,"poly":[[0.245,7.902],[2.125,7.902],[2.125,7.123],[3.936,7.123],[3.936,9.14],[0.245,9.14]]},{"name":"Chambre 1","plan":12.4,"floor":"vinyl","ext":false,"calc":12.36,"poly":[[4.685,0.619],[9.033,0.619],[9.033,3.462],[4.685,3.462]]},{"name":"Chambre 2","plan":9.1,"floor":"vinyl","ext":false,"calc":9.08,"poly":[[1.429,0.619],[4.624,0.619],[4.624,3.462],[1.429,3.462]]},{"name":"Salle de bain","plan":4.8,"floor":"tile","ext":false,"calc":4.83,"poly":[[2.14,5.029],[3.936,5.029],[3.936,7.069],[1.429,7.069],[1.429,5.426],[2.14,5.426]]},{"name":"WC","plan":2.1,"floor":"vinyl","ext":false,"calc":2.1,"poly":[[1.429,3.523],[2.881,3.523],[2.881,4.968],[1.429,4.968]]},{"name":"Dégagement","plan":3.7,"floor":"vinyl","ext":false,"calc":3.67,"poly":[[2.95,3.523],[5.816,3.523],[5.816,4.715],[3.936,4.715],[3.936,4.968],[2.95,4.968]]},{"name":"Balcon","plan":9.6,"floor":"deck","ext":true,"calc":9.47,"poly":[[9.408,3.248],[11.677,3.248],[11.677,7.421],[9.408,7.421]]},{"name":"Cellier","plan":1.8,"floor":"concrete","ext":true,"calc":1.77,"poly":[[9.408,7.612],[11.632,7.612],[11.632,8.407],[9.408,8.407]]}],"posts":[[9.492,3.141],[10.516,3.141],[11.739,3.256],[11.739,4.28],[11.739,5.319],[11.739,6.343],[11.739,7.382]],"rails":[[9.438,3.194,11.739,3.271],[11.616,3.194,11.693,7.421]],"kit":{"runs":[{"r":[4.02,5.426,4.677,7.046],"wall":"w","upper":true},{"r":[4.677,7.123,5.281,7.818],"wall":"s"}],"tall":[[4.02,4.799,4.677,5.426]],"hob":[4.769,7.199,5.197,7.734],"sink":[4.112,6.458,4.585,6.916],"sinkWall":"w","hood":[4.723,7.337,5.258,7.818]},"bath":{"wc":{"r":[1.437,4.341,2.079,4.799],"back":"w"},"tub":[1.437,5.441,2.094,7.046],"vanity":{"r":[2.125,6.572,3.301,7.062],"back":"s","basins":[[2.423,6.817],[3.003,6.817]]},"washer":{"r":[3.332,6.496,3.928,7.031],"front":"n"},"tiles":[{"a":[1.437,5.434],"b":[1.437,7.062],"n":[1,0]},{"a":[1.429,5.434],"b":[2.094,5.434],"n":[0,1]},{"a":[1.429,7.062],"b":[2.094,7.062],"n":[0,-1]}],"mirror":{"a":[2.186,7.062],"b":[3.24,7.062],"n":[0,-1],"y0":1.05,"y1":1.85}},"obst":[{"r":[1.246,0.245,2.858,0.481]},{"r":[3.768,0.245,5.93,0.481]},{"r":[6.832,0.245,9.4,0.481]},{"r":[1.246,0.481,2.82,0.619]},{"r":[3.806,0.481,5.885,0.619]},{"r":[6.878,0.481,9.408,0.619]},{"r":[1.246,0.619,1.429,3.462]},{"r":[4.624,0.619,4.685,3.462]},{"r":[9.033,0.619,9.408,3.462]},{"r":[1.246,3.462,3.691,3.523]},{"r":[5.617,3.462,9.408,3.523]},{"r":[5.648,3.531,5.877,3.691]},{"r":[5.816,3.691,5.877,4.715]},{"r":[3.936,4.715,4.799,4.799]},{"r":[5.686,4.715,5.877,4.799]},{"r":[9.033,3.523,9.408,4.799]},{"r":[9.171,4.799,9.408,4.853]},{"r":[1.246,3.523,1.429,4.968]},{"r":[2.881,4.463,2.95,4.968]},{"r":[3.936,4.799,4.035,4.968]},{"r":[1.246,4.968,2.996,5.029]},{"r":[1.246,5.052,1.421,5.342]},{"r":[2.056,5.052,2.14,5.342]},{"r":[1.246,5.342,2.14,5.426]},{"r":[3.936,5.029,4.02,6.962]},{"r":[1.246,5.426,1.429,7.023]},{"r":[3.936,6.962,4.669,7.031]},{"r":[1.246,7.069,4.043,7.123]},{"r":[9.171,7.237,9.4,7.291]},{"r":[9.033,7.291,9.408,7.421]},{"r":[1.246,7.138,1.421,7.459]},{"r":[2.018,7.138,2.125,7.459]},{"r":[1.246,7.459,2.125,7.566]},{"r":[9.033,7.459,9.591,7.612]},{"r":[10.462,7.421,11.823,7.612]},{"r":[1.246,7.566,1.444,7.719]},{"r":[3.936,7.123,4.043,7.795]},{"r":[4.57,7.069,4.677,7.795]},{"r":[0.061,7.719,1.437,7.803]},{"r":[2.033,7.566,2.125,7.803]},{"r":[0.061,7.803,1.467,7.902]},{"r":[2.002,7.803,2.125,7.902]},{"r":[3.065,7.123,3.149,7.902]},{"r":[3.936,7.818,5.281,7.902]},{"r":[0.061,7.902,0.245,8.101]},{"r":[9.033,7.612,9.408,8.407]},{"r":[11.632,7.612,11.823,8.407]},{"r":[9.033,8.407,11.823,8.598]},{"r":[9.033,8.598,9.408,9.14]},{"r":[0.061,9.14,9.408,9.331]},{"r":[4.585,3.462,4.723,3.523]},{"r":[1.421,5.052,2.056,5.342]},{"r":[1.429,7.138,2.018,7.459]},{"r":[1.429,7.566,2.033,7.803]},{"r":[4.043,7.031,4.57,7.795]},{"r":[1.246,7.023,1.429,7.069]},{"r":[2.858,0.245,3.768,0.619]},{"r":[5.93,0.245,6.832,0.619]},{"r":[9.033,6.381,9.408,7.237]},{"r":[0.061,8.101,0.245,9.14]},{"r":[9.438,3.194,11.739,3.271]},{"r":[11.616,3.194,11.693,7.421]}],"views":{"Entrée":{"p":[0.917,8.559],"look":[6.572,8.407]},"Séjour":{"p":[5.655,8.559],"look":[8.865,4.891]},"Cuisine":{"p":[6.267,6.725],"look":[4.165,5.808]},"Canapé":{"p":[6.381,4.662],"look":[9.033,5.885]},"Chambre 1":{"p":[8.636,1.07],"look":[5.426,3.21]},"Chambre 2":{"p":[4.203,3.133],"look":[1.987,1.07]},"Salle de bain":{"p":[3.783,5.235],"look":[1.911,6.916]},"Balcon":{"p":[10.088,6.649],"look":[16.507,5.12]}},"curtains":[{"a":[2.446,0.719],"b":[2.828,0.719]},{"a":[3.798,0.719],"b":[4.203,0.719]},{"a":[5.502,0.719],"b":[5.9,0.719]},{"a":[6.863,0.719],"b":[7.276,0.719]},{"a":[8.933,7.276],"b":[8.933,7.986]}],"rods":[{"a":[2.331,0.719],"b":[4.318,0.719]},{"a":[5.388,0.719],"b":[7.375,0.719]},{"a":[8.933,4.738],"b":[8.933,8.024]}],"furn":[{"t":"rug","r":[6.916,3.745,8.559,5.655],"nomap":true},{"t":"sofa","r":[5.9,3.63,6.817,5.831]},{"t":"coffee","c":[7.696,4.7],"rad":0.4},{"t":"floorlamp","c":[6.381,6.114],"nomap":true},{"t":"tvunit","r":[8.682,3.684,9.018,4.799]},{"t":"palm","c":[8.773,7.031],"rad":0.23},{"t":"art","pos":[5.888999999999999,1.55,4.203],"ry":1.5708,"w":0.8,"h":0.55,"motif":"sea","nomap":true},{"t":"table","r":[6.993,7.069,7.795,8.483]},{"t":"chair","c":[6.763,7.375],"face":[7.39,7.772]},{"t":"chair","c":[6.763,8.177],"face":[7.39,7.772]},{"t":"chair","c":[8.024,7.375],"face":[7.39,7.772]},{"t":"chair","c":[8.024,8.177],"face":[7.39,7.772]},{"t":"chair","c":[7.39,6.84],"face":[7.39,7.772]},{"t":"chair","c":[7.39,8.728],"face":[7.39,7.772]},{"t":"pendant","c":[7.39,7.772],"nomap":true},{"t":"bed","r":[6.328,1.46,7.933,3.462],"dir":"s"},{"t":"night","c":[6.099,3.256],"rad":0.2},{"t":"night","c":[8.162,3.256],"rad":0.2},{"t":"wardrobe","r":[4.708,0.688,5.304,2.904],"dir":"e"},{"t":"art","pos":[7.13,1.58,3.45],"ry":3.1416,"w":1,"h":0.5,"motif":"dunes","nomap":true},{"t":"bed","r":[2.125,1.567,3.546,3.462],"dir":"s"},{"t":"night","c":[1.819,3.256],"rad":0.19},{"t":"desk","r":[4.012,0.726,4.608,1.926]},{"t":"chair","c":[3.745,1.322],"face":[4.608,1.322]},{"t":"towel","r":[3.882,5.35,3.936,6.037],"dir":"e","nomap":true},{"t":"bathmat","r":[2.155,5.885,2.751,6.534],"nomap":true},{"t":"outrug","r":[9.782,3.821,11.158,5.197],"nomap":true},{"t":"round","c":[10.47,4.509],"rad":0.3,"h":0.72,"wood":"teak"},{"t":"chair","c":[10.47,4.012],"face":[10.47,4.509],"plain":true},{"t":"chair","c":[10.47,5.006],"face":[10.47,4.509],"plain":true},{"t":"lounger","r":[11.005,5.35,11.578,7.222],"dir":"n"},{"t":"olive","c":[11.425,3.477],"rad":0.2},{"t":"garland","nomap":true,"a":[11.677,3.256],"b":[11.677,7.382],"spans":[3.256,4.28,5.319,6.343,7.382]}],"mass":[[-12.533,0.245,0.061,9.331],[0.061,0.245,1.246,7.719]],"center":[5.923,4.815],"forest":{"origin":[11.846,4.738],"d0":9,"d1":75,"lat0":-40,"lat1":40},"becs":[3.569,7.551]};</script>
+<script type="module" src="moteur.js?v=65fbbde9"></script>
+</body>
+</html>

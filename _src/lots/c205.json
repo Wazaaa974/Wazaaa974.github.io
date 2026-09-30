@@ -1,0 +1,14 @@
+{
+ "base": "c105",
+ "meta": {
+  "name": "C205",
+  "level": 2,
+  "facts": ["T3", "63,4 m²", "R+2", "nord · forêt"],
+  "src": "Relevé du plan de vente du 07/08/2025 : même plan que le C105, avec des soffites sur l'entrée, le placard et la salle de bain. Leur hauteur n'est pas cotée sur le plan : prise à 2,25 m comme à l'A201. Meubles d'esprit bord de mer aux cotes standard : lits 160 × 200 et 140 × 190, table 140 × 80."
+ },
+ "soffits": [
+  [1.429, 5.029, 3.936, 7.069, 2.25],
+  [2.125, 7.123, 3.065, 7.818, 2.25],
+  [0.245, 7.902, 5.281, 9.14, 2.25]
+ ]
+}

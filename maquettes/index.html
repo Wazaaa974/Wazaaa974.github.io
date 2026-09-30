@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Maquettes 3D · Cap Ouest</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Maquettes 3D · Cap Ouest">
+<meta property="og:description" content="Deux appartements relevés sur le plan de vente et visitables en 3D dans le navigateur.">
+<meta property="og:url" content="https://wazaaa974.github.io/maquettes/">
+<meta property="og:image" content="https://wazaaa974.github.io/maquettes/cap-ouest-a201.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of two lot cards, same palette and faces as the 3D pages they open */
+:root{
+  color-scheme:light;
+  --bg:#e7ecea; --panel:#f9faf8; --ink:#1b2420; --muted:#58675f; --line:rgba(27,36,32,.13);
+  --accent:#1d7a76; --accent-ink:#ffffff; --chip:#eef2f0; --shadow:0 8px 28px rgba(20,32,28,.12);
+  --sans:"Jost","Avenir Next","Century Gothic",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --bg:#111715; --panel:#171f1c; --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.4); }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --bg:#111715; --panel:#171f1c; --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.4); }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;padding-inline:16px}
+main{max-width:980px;margin:0 auto;padding-block:clamp(32px,7vw,72px) 40px;display:grid;gap:clamp(28px,5vw,48px)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h1{margin:0;font-weight:600;font-size:clamp(32px,6vw,52px);line-height:1.05;letter-spacing:.005em;text-wrap:balance}
+.lede{margin:14px 0 0;max-width:62ch;color:var(--muted);font-size:17px}
+.lots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px}
+.lot{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);color:inherit;text-decoration:none;transition:transform .2s ease,box-shadow .2s ease}
+.lot:hover{transform:translateY(-2px)}
+.lot:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.lot img{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:1200/630;object-fit:cover;background:var(--chip)}
+.lot-body{display:grid;gap:10px;padding:16px 18px 18px}
+.lot-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.lot h2{margin:0;font-size:28px;font-weight:600;line-height:1;letter-spacing:.02em}
+.bat{font-size:13px;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:5px}
+.facts span{font:12px/1.4 var(--mono);font-variant-numeric:tabular-nums;padding:2px 8px;border-radius:999px;background:var(--chip)}
+.go{justify-self:start;margin-top:4px;padding:8px 14px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-weight:500;font-size:15px}
+.how{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:24px}
+.how h2{margin:0;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.steps{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+.steps li{display:grid;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;min-width:0}
+.steps b{font-weight:500}
+.steps span{font:12.5px/1.45 var(--mono);color:var(--muted)}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
+footer a{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Cap Ouest · Carcans</p>
+    <h1>Maquettes 3D interactives</h1>
+    <p class="lede">Deux appartements relevés au centimètre sur le plan de vente et meublés aux cotes standard. On les visite pièce par pièce dans le navigateur, sur ordinateur comme sur téléphone, sans rien installer.</p>
+  </header>
+
+  <section class="lots" aria-label="Appartements">
+    <a class="lot" href="cap-ouest-a201.html">
+      <img src="cap-ouest-a201.jpg" alt="Vue 3D en plongée de l'appartement A201 meublé, balcon côté forêt" width="1200" height="630">
+      <div class="lot-body">
+        <div class="lot-head"><h2>A201</h2><span class="bat">Bâtiment A</span></div>
+        <div class="facts"><span>T2</span><span>48,3 m²</span><span>+ 14,0 m² ext.</span><span>R+2</span><span>nord · forêt</span></div>
+        <span class="go">Ouvrir la maquette</span>
+      </div>
+    </a>
+    <a class="lot" href="cap-ouest-c105.html">
+      <img src="cap-ouest-c105.jpg" alt="Vue 3D en plongée de l'appartement C105 meublé, deux chambres et balcon" width="1200" height="630">
+      <div class="lot-body">
+        <div class="lot-head"><h2>C105</h2><span class="bat">Bâtiment C</span></div>
+        <div class="facts"><span>T3</span><span>63,4 m²</span><span>+ 11,4 m² ext.</span><span>R+1</span><span>nord · forêt</span></div>
+        <span class="go">Ouvrir la maquette</span>
+      </div>
+    </a>
+  </section>
+
+  <section class="how" aria-labelledby="how">
+    <h2 id="how">Ce qu'on peut faire dedans</h2>
+    <ul class="steps">
+      <li><b>Maquette</b><span>vue d'ensemble, rotation, zoom, plan de situation</span></li>
+      <li><b>Visite</b><span>à hauteur d'yeux, portes qui s'ouvrent, surfaces par pièce</span></li>
+      <li><b>Variantes</b><span>avec ou sans meubles, deux implantations de cuisine</span></li>
+      <li><b>Mode photo</b><span>rendu par lancer de rayons, lumière de jour ou soir d'été</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Maquettes non contractuelles, établies d'après le plan de vente du 07/08/2025.</span>
+    <span>Thomas Alonso · <a href="../">portfolio</a></span>
+  </footer>
+</main>
+</body>
+</html>

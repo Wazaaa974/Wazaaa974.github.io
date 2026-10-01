@@ -610,7 +610,7 @@ function updateRoom(){
   if (SUN.on) sunReadout();
 }
 
-// ---------- soleil réel à Carcans : position du soleil (formules NOAA, ±0,1°), heure légale de Paris,
+// ---------- soleil réel à Carcans : position du soleil (formules approchées de l’USNO, ≈ 0,1°), heure légale de Paris,
 //            ombres en temps réel et bilan d'ensoleillement par pièce (lancer de rayons sur un modèle simplifié)
 const SITE = {lat: GEO.lat ?? 45.08, lon: GEO.lon ?? -1.09};
 const NDEG = GEO.northDeg ?? ({'0,-1':0, '1,0':90, '0,1':180, '-1,0':270}[String(GEO.north || [0,-1])] ?? 0);   // nord vrai, en degrés depuis le haut du plan (sens horaire)

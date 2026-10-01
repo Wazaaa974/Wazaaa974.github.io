@@ -93,6 +93,25 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .toggles{order:4}
   .hint{font-size:11px}
 }
+/* ---------- mode Soleil ---------- */
+.sunrow{flex:1 0 100%;display:grid;grid-template-columns:auto minmax(150px,1fr) minmax(150px,1fr) auto;gap:4px 14px;align-items:center;padding:0 2px 7px;border-bottom:1px solid var(--line)}
+.sunplay{width:30px;height:30px;border-radius:50%;border:1px solid var(--accent);background:transparent;color:var(--accent);display:grid;place-items:center;padding:0}
+.sl{display:grid;grid-template-columns:auto 1fr 54px;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.sl input{width:100%;margin:0;accent-color:var(--accent)}
+.sl output{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:right;white-space:nowrap}
+.sunpre{display:flex;gap:3px}
+.sunpre button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 8px;font-size:11.5px;white-space:nowrap}
+.suninfo{grid-column:1 / -1;margin:0;font-size:12px;line-height:1.35;color:var(--ink)}
+.suninfo .mono{font-size:11px;color:var(--muted);margin-right:6px}
+.sunnote{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+@media (max-width:860px){ .sunrow{grid-template-columns:auto 1fr 1fr} .sunpre{grid-column:2 / -1} }
+@media (max-width:560px){
+  .sunrow{grid-template-columns:auto 1fr;gap:4px 10px}
+  .sunrow .sl:nth-of-type(2){grid-column:2}
+  .sunpre{grid-column:1 / -1}
+  .suninfo{font-size:11px}
+  .sunnote{display:none}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -119,6 +138,13 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <p id="hint" class="hint">Glisse pour tourner · clic sur une porte pour l’ouvrir</p>
 
   <nav id="bar" class="card bar" aria-label="Commandes">
+    <div id="sunRow" class="sunrow" hidden>
+      <button id="sunPlay" class="sunplay" type="button" aria-label="Faire défiler la journée"></button>
+      <label class="sl"><span>Date</span><input id="sunDay" type="range" min="1" max="365" step="1"><output id="sunDayL"></output></label>
+      <label class="sl"><span>Heure</span><input id="sunMin" type="range" min="300" max="1380" step="5"><output id="sunMinL"></output></label>
+      <div class="sunpre" id="sunPresets" role="group" aria-label="Journées types"><button type="button" data-day="355">21 déc.</button><button type="button" data-day="80">21 mars</button><button type="button" data-day="172">21 juin</button><button type="button" data-day="today">Auj.</button></div>
+      <p class="suninfo"><span id="sunNow" class="mono"></span><span id="sunRooms"></span><span class="sunnote">Soleil calculé pour Carcans toutes les 10 min, au sol de chaque pièce ; ombres des bâtiments voisins d’après le plan de masse, arbres non pris en compte.</span></p>
+    </div>
     <div class="seg">
       <button id="bOrbit" aria-pressed="true">Maquette</button>
       <button id="bVisit" aria-pressed="false">Visite</button>
@@ -127,8 +153,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <button id="bOpts" class="opts" type="button" aria-expanded="true" aria-controls="toggles"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.5" cy="4.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5.5" cy="11.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Options</button>
     <div class="toggles" id="toggles">
       <button id="tCeil" class="tog" aria-pressed="true" hidden>Plafond</button>
-      <button id="tPhoto" class="tog" aria-pressed="false">Mode photo</button>
-      <button id="tEve" class="tog" aria-pressed="false">Soir d’été</button>
+      <button id="tSun" class="tog" aria-pressed="false" title="Soleil réel à Carcans : date, heure, ombres et heures de soleil par pièce">Soleil</button>
       <button id="tFurn" class="tog" aria-pressed="true">Meubles</button>
       <button id="tSlide" class="tog" aria-pressed="true" title="Portes coulissantes suspendues pour la chambre et la salle d’eau">Portes coulissantes</button>
       <div class="seg" role="group" aria-label="Cuisine" id="kitSeg"><button id="k0" aria-pressed="false">Sans cuisine</button><button id="kA" aria-pressed="true">Cuisine A</button><button id="kB" aria-pressed="false">B colonnes</button></div>

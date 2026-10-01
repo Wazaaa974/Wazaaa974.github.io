@@ -1,4 +1,4 @@
-"""Test de fumée : chaque page hors ligne se charge, le moteur démarre, aucune erreur console. Code de sortie 1 sinon."""
+"""Test de fumée : chaque page hors ligne se charge, le moteur démarre, toutes les vues et le mode Soleil passent, aucune erreur console. Code de sortie 1 sinon."""
 import asyncio, glob, os, sys
 from playwright.async_api import async_playwright
 SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -16,6 +16,11 @@ async def main():
                 for v in await pg.evaluate("Object.keys(window.GEO.views)"):
                     await pg.evaluate(f"window.__lot.goTo({v!r})")
                 await pg.wait_for_timeout(300)
+                await pg.evaluate("window.__lot.setSun(true)")          # mode Soleil : le bilan par pièce doit aboutir
+                for _ in range(80):
+                    await pg.wait_for_timeout(250)
+                    if await pg.evaluate("!!window.__lot.bilan()"): break
+                else: errs.append('bilan d’ensoleillement non calculé')
             name = os.path.basename(f); status = 'OK' if ok and not errs else 'ÉCHEC'
             if status != 'OK': bad += 1
             print(f"{status:5s} {name}  {errs[:2] if errs else ''}")

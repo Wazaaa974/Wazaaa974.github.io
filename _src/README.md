@@ -15,7 +15,8 @@ tools/zoom.py       relevé : agrandissement d'une zone du plan avec la grille, 
 tools/overlay.py    contrôle : le relevé superposé au plan de vente d'origine
 tools/shots.py      captures de contrôle (visites, mobile, erreurs console)
 tools/compare.py    non-régression : même scénario sur deux versions d'une page
-tools/smoke.py      chaque page hors ligne se charge et parcourt toutes ses vues sans erreur
+tools/smoke.py      chaque page hors ligne se charge, parcourt toutes ses vues et calcule son ensoleillement sans erreur
+tools/soleil.py     contrôle du mode Soleil : captures à des dates et heures données + bilan par pièce
 ```
 
 ## Lots sous toiture
@@ -36,3 +37,13 @@ python3 tools/preview.py ../maquettes
 
 Le build compare chaque pièce relevée à la surface du plan (écart toléré : 1 % ou 0,2 m²) et le signale sinon.
 Les PDF du promoteur ne sont pas versionnés ici.
+
+## Mode Soleil
+
+Le soleil est calculé pour Carcans (45,08° N ; 1,09° O), à l'heure légale de Paris, pour la date et l'heure choisies.
+`northDeg` dans un relevé donne le nord vrai, en degrés depuis le haut du plan dans le sens horaire. Il est mesuré sur le plan
+de masse : 6,2° pour le bâtiment A, 78,7° pour B et C.
+Les ombres viennent du bâtiment lui-même (planchers, balcons couverts) et des volumes voisins (`mass`), prolongés jusqu'au
+faîtage d'un R+3. Les arbres ne comptent pas : ils sont décoratifs et ne sont pas placés fidèlement.
+Le bilan par pièce lance des rayons vers le soleil depuis un point du sol tous les 30 cm, toutes les 10 minutes. Le soleil
+compte entre le lever et le coucher, au-dessus de 4° (horizon de pins et de dunes), dès qu'au moins 2 % du sol est éclairé.

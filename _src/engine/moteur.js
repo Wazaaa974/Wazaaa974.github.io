@@ -2,7 +2,6 @@ import * as NS from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { WebGLPathTracer, GradientEquirectTexture } from 'three-gpu-pathtracer';
 const THREE = Object.assign({}, NS, { RoundedBoxGeometry, RoomEnvironment });
 const GEO = window.GEO;
 (function(){
@@ -89,6 +88,9 @@ M.faience.map = faienceTex; M.faience.color.set(0xffffff);
 // ---------- helpers
 const groups = { walls:new THREE.Group(), caps:new THREE.Group(), ceil:new THREE.Group(), kitchen:new THREE.Group(), world:new THREE.Group(), furn:new THREE.Group() };
 Object.values(groups).forEach(g => scene.add(g));
+// objets qui portent une ombre sans être dessinés (plafonds en vue maquette, étages au-dessus des voisins) : mode Soleil
+const SHADOW_M = new THREE.MeshBasicMaterial({colorWrite:false, depthWrite:false}), shadowOnly = new THREE.Group(); shadowOnly.visible = false; scene.add(shadowOnly);
+const TREES = [], ROOFH = GEO.roofTop ?? ((GEO.storeys ?? 3) + 1 - (GEO.meta.level ?? 2)) * 2.95 + 1.3;   // TREES : maillages des pins ; ROOFH : faîtage approximatif des bâtiments en R+3
 function box(x0, z0, x1, z1, y0, y1, m, parent = groups.walls){
   const w = Math.abs(x1-x0), d = Math.abs(z1-z0), h = y1-y0; if (w < 1e-4 || d < 1e-4 || h < 1e-4) return null;
   const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set((x0+x1)/2, (y0+y1)/2, (z0+z1)/2); parent.add(b); return b;
@@ -464,7 +466,8 @@ const FX = { lamps:[], glow:[], ao:[] };
 (function(){
   const g = groups.world;
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), M.ground); ground.rotation.x = -Math.PI/2; ground.position.set(GEO.center[0], GROUND, GEO.center[1]); g.add(ground);
-  for (const b of GEO.mass) box(b[0], b[1], b[2], b[3], GROUND, b[4] ?? TOP, M.slab, g);   // 5e valeur : hauteur au-dessus du plancher (bâtiment voisin)
+  for (const b of GEO.mass){ box(b[0], b[1], b[2], b[3], GROUND, b[4] ?? TOP, M.slab, g);   // 5e valeur : hauteur au-dessus du plancher (bâtiment voisin)
+    if (b[4] === undefined) box(b[0], b[1], b[2], b[3], TOP, ROOFH, SHADOW_M, shadowOnly); }   // étages du dessus : ombre portée seulement
   const N = 190, trunkG = new THREE.CylinderGeometry(0.16, 0.26, 1, 7), crownG = new THREE.IcosahedronGeometry(1, 0);
   const gT = [], g1 = [], g2 = [];
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), ps = new THREE.Vector3();
@@ -478,7 +481,7 @@ const FX = { lamps:[], glow:[], ao:[] };
     ps.set(x, GROUND + h - 0.2, z); sc.set(r, r*0.55, r*0.9); m4.compose(ps, q, sc); g1.push(crownG.clone().applyMatrix4(m4));
     ps.set(x + rnd()*1.6 - .8, GROUND + h - 1.6, z + rnd()*1.6 - .8); sc.set(r*.8, r*.45, r*.75); m4.compose(ps, q, sc); g2.push(crownG.clone().applyMatrix4(m4));
   }
-  g.add(new THREE.Mesh(mergeGeometries(gT), M.trunk), new THREE.Mesh(mergeGeometries(g1), M.crown), new THREE.Mesh(mergeGeometries(g2), M.crown2));
+  TREES.push(new THREE.Mesh(mergeGeometries(gT), M.trunk), new THREE.Mesh(mergeGeometries(g1), M.crown), new THREE.Mesh(mergeGeometries(g2), M.crown2)); g.add(...TREES);
 })();
 
 // ---------- portes coulissantes suspendues (option) : chambre et salle d'eau, rail acier noir
@@ -545,10 +548,9 @@ setSlide(GEO.slides.length > 0);
 })();
 
 const LAY = { cur:'A' };
-const photo = { on:false, ready:false, dirty:false, building:false, preset:'day', saved:null, last:new THREE.Matrix4(), n:0 };
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
-const shadowsDirty = () => { renderer.shadowMap.needsUpdate = true; photo.dirty = true; };
+const shadowsDirty = () => { renderer.shadowMap.needsUpdate = true; };
 (function(){
   const pmrem = new THREE.PMREMGenerator(renderer); scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
   const seen = new Set();
@@ -560,20 +562,21 @@ const shadowsDirty = () => { renderer.shadowMap.needsUpdate = true; photo.dirty 
     o.castShadow = !basic && !clear; o.receiveShadow = !basic;
   });
   FX.std = [...seen].filter(m => m.isMeshStandardMaterial);
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = -24; sc.right = 24; sc.top = 24; sc.bottom = -24; sc.near = 1; sc.far = 140;
+  groups.ceil.traverse(o => { if (!o.isMesh || o.material === M.glass) return; o.updateWorldMatrix(true, false); const c = new THREE.Mesh(o.geometry, SHADOW_M); c.applyMatrix4(o.matrixWorld); shadowOnly.add(c); });
+  shadowOnly.traverse(o => { if (o.isMesh){ o.castShadow = true; o.receiveShadow = false; } });
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = -24; sc.right = 24; sc.top = 24; sc.bottom = -24; sc.near = 1; sc.far = 220;
   sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; sun.target.position.set(GEO.center[0], 0, GEO.center[1]); scene.add(sun.target);
   FX.points = FX.lamps.map(([x,y,z,lay]) => { const p = new THREE.PointLight(0xffb46b, 0, 6.5, 2); p.userData.lay = lay; p.position.set(x,y,z); scene.add(p); return p; });
 })();
 const PRESETS = {
-  day: {sky:0xc6dbe4, fog:0xcfdfe4, hemi:.42, fill:.1, sun:[16,40,24], sunC:0xfff4e6, sunI:1.2, env:.6, lamp:0, glow:0, exp:.88},
-  eve: {sky:0xe6bf9f, fog:0xd9b597, hemi:.2, fill:.05, sun:[-26,10,-32], sunC:0xffa35c, sunI:2.6, env:.32, lamp:1.4, glow:1.1, exp:1.05}
+  day: {sky:0xc6dbe4, fog:0xcfdfe4, hemi:.42, fill:.1, sun:[16,40,24], sunC:0xfff4e6, sunI:1.2, env:.6, lamp:0, glow:0, exp:.88}
 };
 function applyPreset(k){
-  const P = PRESETS[k]; photo.preset = k; if (!photo.on){ scene.background.set(P.sky); scene.fog.color.set(P.fog); } else { photo.saved.bg.set(P.sky); photo.saved.fog.color.set(P.fog); }
+  const P = PRESETS[k]; scene.background.set(P.sky); scene.fog.color.set(P.fog); scene.environmentIntensity = 1;   // rendu d'origine
   hemi.intensity = P.hemi; fill.intensity = P.fill; const NV = GEO.north || [0,-1], EV = [-NV[1], NV[0]], v = new THREE.Vector3(P.sun[0]*EV[0] - P.sun[2]*NV[0], P.sun[1], P.sun[0]*EV[1] - P.sun[2]*NV[1]).setLength(55);
   sun.position.set(GEO.center[0] + v.x, v.y, GEO.center[1] + v.z); sun.color.set(P.sunC); sun.intensity = P.sunI;
   FX.std.forEach(m => { m.envMapIntensity = P.env; }); FX.points.forEach(p => { p.intensity = (!p.userData.lay || p.userData.lay === LAY.cur) ? P.lamp : 0; }); FX.glow.forEach(m => { m.emissiveIntensity = P.glow; });
-  renderer.toneMappingExposure = P.exp; shadowsDirty(); if (photo.on) ptLook();
+  renderer.toneMappingExposure = P.exp; shadowsDirty();
 }
 applyPreset('day');
 
@@ -604,7 +607,153 @@ function updateRoom(){
   $('hsp').textContent = r && r.floor === 'deck' ? 'Balcon couvert · garde-corps 1,00 m' : so ? 'Sous soffite : ' + fmtM(so.h) + ' m'
     : slopeHere ? 'Sous rampant : ' + fmtM(ch) + ' m (' + fmtM(pn.h0) + ' → ' + fmtM(pn.cap ?? H) + ' m)' : 'Sous plafond : ' + fmtM(ch) + ' m';
   document.querySelectorAll('#chips button').forEach(b => b.classList.toggle('here', name.startsWith(b.dataset.room) || (b.dataset.room === 'Séjour' && name.startsWith('Séjour'))));
+  if (SUN.on) sunReadout();
 }
+
+// ---------- soleil réel à Carcans : position du soleil (formules NOAA, ±0,1°), heure légale de Paris,
+//            ombres en temps réel et bilan d'ensoleillement par pièce (lancer de rayons sur un modèle simplifié)
+const SITE = {lat: GEO.lat ?? 45.08, lon: GEO.lon ?? -1.09};
+const NDEG = GEO.northDeg ?? ({'0,-1':0, '1,0':90, '0,1':180, '-1,0':270}[String(GEO.north || [0,-1])] ?? 0);   // nord vrai, en degrés depuis le haut du plan (sens horaire)
+const NR = NDEG*Math.PI/180, NVT = [Math.sin(NR), -Math.cos(NR)], EVT = [Math.cos(NR), Math.sin(NR)];
+function sunPos(t){                                   // t : instant en ms UTC → hauteur et azimut (rad ; azimut depuis le nord, sens horaire)
+  const r = Math.PI/180, d = t/86400000 - 10957.5;   // jours depuis J2000.0
+  const g = (357.529 + 0.98560028*d)*r, L = (280.459 + 0.98564736*d + 1.915*Math.sin(g) + 0.020*Math.sin(2*g))*r, e = (23.439 - 3.6e-7*d)*r;
+  const ra = Math.atan2(Math.cos(e)*Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e)*Math.sin(L));
+  const gmst = ((18.697374558 + 24.06570982441908*d) % 24 + 24) % 24, Hh = (gmst*15 + SITE.lon)*r - ra, la = SITE.lat*r;
+  const alt = Math.asin(Math.sin(la)*Math.sin(dec) + Math.cos(la)*Math.cos(dec)*Math.cos(Hh));
+  const az = Math.atan2(-Math.sin(Hh), Math.tan(dec)*Math.cos(la) - Math.sin(la)*Math.cos(Hh));
+  return {alt, az: (az + 2*Math.PI) % (2*Math.PI)};
+}
+const horiz = az => [NVT[0]*Math.cos(az) + EVT[0]*Math.sin(az), NVT[1]*Math.cos(az) + EVT[1]*Math.sin(az)];   // direction du soleil dans le plan
+const lastSunday = (y, m) => { const d = new Date(Date.UTC(y, m + 1, 0)); return d.getUTCDate() - d.getUTCDay(); };
+function toUTC(y, doy, min){                          // jour de l'année + minutes à l'heure de Paris → ms UTC
+  const base = Date.UTC(y, 0, doy), d = new Date(base), m = d.getUTCMonth(), dd = d.getUTCDate();
+  const summer = (m > 2 && m < 9) || (m === 2 && dd >= lastSunday(y, 2)) || (m === 9 && dd < lastSunday(y, 9));
+  return base + (min - (summer ? 120 : 60))*60000;
+}
+function todayParis(){
+  try { const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {timeZone:'Europe/Paris', year:'numeric', month:'numeric', day:'numeric', hour:'numeric', minute:'numeric', hourCycle:'h23'}).formatToParts(new Date()).map(x => [x.type, x.value]));
+    const y = +p.year; return {doy: Math.min(365, Math.round((Date.UTC(y, p.month - 1, +p.day) - Date.UTC(y, 0, 0))/864e5)), min: (+p.hour)*60 + (+p.minute)}; }
+  catch (e){ return {doy: 172, min: 960}; }
+}
+const SUN = {on:false, play:false, init:false, year:new Date().getFullYear(), day:172, min:960, alt:0, az:0, rise:360, set:1320};
+const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'], MOIS3 = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const DIRS = ['nord','nord-est','est','sud-est','sud','sud-ouest','ouest','nord-ouest'];
+const dayLabel = (doy, short) => { const d = new Date(Date.UTC(SUN.year, 0, doy)); return d.getUTCDate() + (d.getUTCDate() === 1 ? 'er' : '') + ' ' + (short ? MOIS3 : MOIS)[d.getUTCMonth()]; };
+const hm = m => { const r = Math.round(m); return Math.floor(r/60) + ' h ' + String(r % 60).padStart(2, '0'); };
+const dur = m => { const r = Math.round(m/5)*5; return r >= 60 ? Math.floor(r/60) + ' h' + (r % 60 ? ' ' + String(r % 60).padStart(2, '0') : '') : r + ' min'; };
+const toward = az => { const d = DIRS[Math.round(az/(Math.PI/4)) % 8]; return /^[eo]/.test(d) ? "à l'" + d : 'au ' + d; };
+function riseSet(){
+  let rise = null, set = null; for (let m = 180; m <= 1440; m += 2){ if (sunPos(toUTC(SUN.year, SUN.day, m)).alt > -0.0145){ if (rise === null) rise = m; set = m; } }
+  SUN.rise = rise ?? 480; SUN.set = set ?? 1080;
+}
+// ambiance selon la hauteur du soleil (°) : nuit, crépuscule, heure dorée, fin d'après-midi, plein jour
+const AMB = [
+  {a:-12, sky:0x1b2433, fog:0x1f2838, hemi:.06, fill:.02, sunC:0xff9a5a, sunI:0,   env:.12, lamp:1.7, glow:1.25, exp:1.2},
+  {a:-3,  sky:0x7b7890, fog:0x878195, hemi:.12, fill:.03, sunC:0xff9a5a, sunI:0,   env:.3,  lamp:1.4, glow:1.1,  exp:1.1},
+  {a:3,   sky:0xe8b896, fog:0xdcb08f, hemi:.14, fill:.03, sunC:0xff9d55, sunI:3.0, env:.42, lamp:.6,  glow:.5,   exp:1.05},
+  {a:12,  sky:0xe2d4c2, fog:0xdcd3c4, hemi:.18, fill:.04, sunC:0xffd6a8, sunI:2.8, env:.5,  lamp:0,   glow:0,    exp:1.0},
+  {a:30,  sky:0xc6dbe4, fog:0xcfdfe4, hemi:.22, fill:.05, sunC:0xfff4e6, sunI:2.6, env:.55, lamp:0,   glow:0,    exp:.95}
+];
+const cA = new THREE.Color(), cB = new THREE.Color(), HORIZ = 4;   // en dessous de 4°, soleil considéré masqué par l'horizon
+function applySun(){
+  const {alt, az} = sunPos(toUTC(SUN.year, SUN.day, SUN.min)), ad = alt*180/Math.PI;
+  let i = 0; while (i < AMB.length - 2 && ad > AMB[i+1].a) i++;
+  const A = AMB[i], Bk = AMB[i+1], t = Math.min(1, Math.max(0, (ad - A.a)/(Bk.a - A.a))), mix = k => A[k] + (Bk[k] - A[k])*t, col = k => cA.set(A[k]).lerp(cB.set(Bk[k]), t);
+  scene.background.copy(col('sky')); scene.fog.color.copy(col('fog')); hemi.intensity = mix('hemi'); fill.intensity = mix('fill');
+  const h = horiz(az), a = Math.max(alt, 0.03);
+  sun.position.set(GEO.center[0] + h[0]*Math.cos(a)*90, Math.sin(a)*90, GEO.center[1] + h[1]*Math.cos(a)*90);
+  const rise = Math.min(1, Math.max(0, ad/HORIZ)); sun.color.copy(col('sunC')); sun.intensity = mix('sunI') * rise*rise*(3 - 2*rise);   // le soleil émerge de l'horizon (pins, dunes) entre 0 et 4°
+  const env = mix('env'), lamp = mix('lamp'), glow = mix('glow');
+  scene.environmentIntensity = env;   // three r164 : l'environnement de la scène suit scene.environmentIntensity, pas material.envMapIntensity
+  FX.points.forEach(p => { p.intensity = (!p.userData.lay || p.userData.lay === LAY.cur) ? lamp : 0; }); FX.glow.forEach(m => { m.emissiveIntensity = glow; });
+  renderer.toneMappingExposure = mix('exp'); shadowsDirty();
+  SUN.alt = alt; SUN.az = az; sunReadout();
+}
+function refreshLight(){ if (SUN.on) applySun(); else applyPreset('day'); }
+
+// --- bilan : pour chaque pièce, part du sol qui voit le soleil, toutes les 10 minutes
+let OCC = null, BILAN = null, bilanT = null, bilanJob = 0;
+function buildOcc(){
+  const boxes = [], add = (r, y0, y1) => { if (y1 > y0 + 1e-3) boxes.push([r[0], y0, r[1], r[2], y1, r[3]]); };
+  const solidB = (r, y0) => { if (!touchesPan(r)){ add(r, y0, TOP); return; }
+    for (const c of gridCells(...r)){ const f = cellFn(c); add(c, y0, Math.max(f(c[0],c[1]), f(c[2],c[1]), f(c[2],c[3]), f(c[0],c[3])) + 0.22); } };
+  for (const w of GEO.walls) solidB(w, -0.3);
+  for (const o of GEO.openings){ solidB(o.r, o.head); if (o.sill) add(o.r, -0.3, o.sill); }
+  for (const p of GEO.posts || []) add([p[0]-0.04, p[1]-0.06, p[0]+0.04, p[1]+0.06], 0, H);
+  for (const sc of GEO.screens || []) add(sc.r, 0, sc.h ?? 1.8);
+  for (const b of GEO.mass) add(b, GROUND, b[4] ?? ROOFH);
+  const bb = polyBox(GEO.rooms.flatMap(r => r.poly)), S = 0.05, x0 = bb[0] - 0.3, z0 = bb[1] - 0.3, nx = Math.ceil((bb[2] - bb[0] + 0.6)/S), nz = Math.ceil((bb[3] - bb[1] + 0.6)/S);
+  const g = new Float32Array(nx*nz).fill(1e9); let maxH = 0;     // hauteur sous plafond (ou soffite) par case de 5 cm ; trous des fenêtres de toit
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++){ const x = x0 + (i + 0.5)*S, z = z0 + (j + 0.5)*S;
+    if (!GEO.rooms.some(r => inPolyG(x, z, r.poly)) || SKY.some(s => inRect(s, x, z))) continue;
+    let c = ceilAt(x, z); for (const so of SOFF) if (inRect(so.r, x, z)) c = Math.min(c, so.h); g[j*nx + i] = c; maxH = Math.max(maxH, c); }
+  return {boxes, g, x0, z0, nx, nz, S, maxH};
+}
+function sunlit(O, D){
+  for (const b of OCC.boxes){ let t0 = 1e-4, t1 = 1e9, hit = true;
+    for (let k = 0; k < 3; k++){ const d = D[k] || 1e-12, a = (b[k] - O[k])/d, c = (b[k+3] - O[k])/d;
+      if (a < c){ if (a > t0) t0 = a; if (c < t1) t1 = c; } else { if (c > t0) t0 = c; if (a < t1) t1 = a; } if (t0 > t1){ hit = false; break; } }
+    if (hit) return false; }
+  const st = OCC.S*0.8/Math.max(Math.hypot(D[0], D[2]), 0.05);
+  for (let t = st*0.5; ; t += st){ const y = O[1] + D[1]*t, i = Math.floor((O[0] + D[0]*t - OCC.x0)/OCC.S), j = Math.floor((O[2] + D[2]*t - OCC.z0)/OCC.S);
+    if (i < 0 || j < 0 || i >= OCC.nx || j >= OCC.nz) break; if (y >= OCC.g[j*OCC.nx + i]) return false; if (y > OCC.maxH + 0.3) break; }
+  return true;
+}
+function roomPts(r, sp = 0.3){ const b = polyBox(r.poly), out = []; for (let x = b[0] + sp/2; x < b[2]; x += sp) for (let z = b[1] + sp/2; z < b[3]; z += sp) if (inPolyG(x, z, r.poly)) out.push([x, 0.05, z]); return out; }
+function rangesOf(ms, frac){
+  const out = []; let cur = null;
+  ms.forEach((m, k) => { if (frac[k] > 0){ if (cur && m - cur[1] <= 15) cur[1] = m + 5; else { cur = [m - 5, m + 5]; out.push(cur); } } });
+  out.forEach(r => { r[0] = Math.max(r[0], SUN.rise); r[1] = Math.min(r[1], SUN.set); }); return out.filter(r => r[1] > r[0]);
+}
+function scheduleBilan(){ clearTimeout(bilanT); if (!SUN.on) return; if (!BILAN || BILAN.day !== SUN.day){ BILAN = null; sunReadout(); } bilanT = setTimeout(runBilan, 250); }
+function runBilan(){
+  if (!OCC) OCC = buildOcc(); const job = ++bilanJob, day = SUN.day, steps = [];
+  for (let m = 240; m <= 1410; m += 10){ const p = sunPos(toUTC(SUN.year, day, m)); if (p.alt > HORIZ*Math.PI/180) steps.push({m, alt:p.alt, az:p.az}); }
+  const rooms = GEO.rooms.map(r => ({r, pts: roomPts(r), lit: []})); let k = 0, cpu = 0;
+  const chunk = () => { if (job !== bilanJob) return; const t0 = performance.now();
+    while (k < steps.length && performance.now() - t0 < 14){ const st = steps[k++], h = horiz(st.az), ca = Math.cos(st.alt), D = [h[0]*ca, Math.sin(st.alt), h[1]*ca];
+      for (const R of rooms){ let n = 0; for (const p of R.pts) if (sunlit(p, D)) n++; R.lit.push(n >= Math.max(4, 0.02*R.pts.length) ? n / R.pts.length : 0); } }
+    cpu += performance.now() - t0; if (k < steps.length){ setTimeout(chunk, 0); return; }
+    const ms = steps.map(s => s.m); BILAN = {day, ms, cpu: Math.round(cpu), rays: steps.length * rooms.reduce((s, R) => s + R.pts.length, 0), rooms: rooms.map(R => ({name: R.r.name, ext: R.r.ext, frac: R.lit, ranges: rangesOf(ms, R.lit)}))}; sunReadout(); };
+  chunk();
+}
+function sunReadout(){
+  if (!SUN.on) return;
+  const ad = Math.round(SUN.alt*180/Math.PI);
+  $('sunNow').textContent = (SUN.alt > 0 ? 'Soleil à ' + ad + '° ' + toward(SUN.az) : 'Soleil couché') + ' · lever ' + hm(SUN.rise) + ', coucher ' + hm(SUN.set);
+  const el = $('sunRooms');
+  if (!BILAN || BILAN.day !== SUN.day){ el.textContent = 'calcul des heures de soleil…'; return; }
+  const tot = R => R.ranges.reduce((s, r) => s + r[1] - r[0], 0), short = n => n.replace(/^Entrée \/ /, '').replace(/ \/ Cuisine$/, '');
+  const here = state.mode === 'visit' && BILAN.rooms.find(R => inPoly(state.x, state.z, GEO.rooms.find(g => g.name === R.name).poly));
+  if (here){
+    let k = 0; BILAN.ms.forEach((m, i) => { if (Math.abs(m - SUN.min) < Math.abs(BILAN.ms[k] - SUN.min)) k = i; });
+    const now = SUN.alt > 0 && BILAN.ms.length && Math.abs(BILAN.ms[k] - SUN.min) <= 10 ? Math.round(here.frac[k]*100) : 0;
+    el.textContent = short(here.name) + ' : ' + (here.ranges.length ? 'soleil direct ' + here.ranges.map(r => hm(r[0]) + ' → ' + hm(r[1])).join(', ') + ' (' + dur(tot(here)) + ')' + (now ? ' · ' + now + ' % du sol au soleil à cette heure' : '') : 'pas de soleil direct ce jour-là');
+    return;
+  }
+  const rs = BILAN.rooms.filter(R => !R.ext || R.ranges.length).sort((a, b) => tot(b) - tot(a));
+  el.textContent = 'Soleil direct ce jour : ' + rs.map(R => short(R.name) + ' ' + (R.ranges.length ? dur(tot(R)) : '0')).join(' · ');
+}
+// --- interface : curseurs date et heure, journées types, lecture
+const sunDay = $('sunDay'), sunMin = $('sunMin'), sunPlay = $('sunPlay');
+const PLAY_I = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>', PAUSE_I = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z" fill="currentColor"/></svg>';
+function syncSunUI(){ sunDay.value = SUN.day; sunMin.value = SUN.min; $('sunDayL').textContent = dayLabel(SUN.day, true); $('sunMinL').textContent = hm(SUN.min);
+  sunPlay.innerHTML = SUN.play ? PAUSE_I : PLAY_I; sunPlay.setAttribute('aria-label', SUN.play ? 'Mettre en pause' : 'Faire défiler la journée'); }
+function dayChanged(){ riseSet(); applySun(); syncSunUI(); scheduleBilan(); }
+function sunTick(dt){ const end = Math.min(1380, SUN.set + 40); SUN.min = Math.min(end, SUN.min + dt*55); if (SUN.min >= end) SUN.play = false; applySun(); syncSunUI(); }
+function setSun(on){
+  SUN.on = on; $('tSun').setAttribute('aria-pressed', on); $('sunRow').hidden = !on; shadowOnly.visible = on; if (!on) SUN.play = false;
+  TREES.forEach(m => { m.castShadow = !on; });   // ensoleillement : ombres des bâtiments seulement, la végétation n'est pas modélisée fidèlement
+  if (on){ if (!SUN.init){ const t = todayParis(); SUN.day = t.doy; SUN.min = t.min; riseSet(); if (sunPos(toUTC(SUN.year, SUN.day, SUN.min)).alt < 0.1) SUN.min = 960; SUN.init = true; } dayChanged(); }
+  else applyPreset('day');
+  shadowsDirty(); lastRoom = null; updateRoom();
+}
+sunDay.addEventListener('input', () => { SUN.day = +sunDay.value; dayChanged(); });
+sunMin.addEventListener('input', () => { SUN.min = +sunMin.value; applySun(); syncSunUI(); });
+sunPlay.addEventListener('click', () => { SUN.play = !SUN.play; if (SUN.play && SUN.min >= Math.min(1380, SUN.set + 40) - 5) SUN.min = Math.max(300, SUN.rise - 20); syncSunUI(); });
+document.querySelectorAll('#sunPresets button').forEach(b => b.addEventListener('click', () => { SUN.day = b.dataset.day === 'today' ? todayParis().doy : +b.dataset.day; dayChanged(); }));
+$('tSun').addEventListener('click', () => setSun(!SUN.on));
 
 // ---------- modes & UI
 const hint = $('hint');
@@ -631,12 +780,11 @@ $('bOrbit').addEventListener('click', () => setMode('orbit'));
 $('bVisit').addEventListener('click', () => setMode('visit'));
 $('tCeil').addEventListener('click', e => { state.ceil = !state.ceil; e.currentTarget.setAttribute('aria-pressed', state.ceil); groups.ceil.visible = state.ceil; shadowsDirty(); });
 $('tFurn').addEventListener('click', e => { state.furn = !state.furn; e.currentTarget.setAttribute('aria-pressed', state.furn); groups.furn.visible = state.furn; shadowsDirty(); });
-$('tEve').addEventListener('click', e => { const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; e.currentTarget.setAttribute('aria-pressed', on); applyPreset(on ? 'eve' : 'day'); });
 function setKitchen(k){
   state.kitchen = k !== '0'; if (k !== '0') state.layout = LAY.cur = k;
   groups.kitchen.visible = state.kitchen; groups.kitA.visible = groups.furnA.visible = state.layout === 'A'; groups.kitB.visible = groups.furnB.visible = state.layout === 'B';
   if (becsDoor) becsDoor.pivot.visible = !state.kitchen || state.layout === 'A';
-  ['0','A','B'].forEach(x => $('k'+x).setAttribute('aria-pressed', x === k)); applyPreset(photo.preset); lastRoom = null;
+  ['0','A','B'].forEach(x => $('k'+x).setAttribute('aria-pressed', x === k)); refreshLight(); lastRoom = null;
 }
 ['0','A','B'].forEach(x => $('k'+x).addEventListener('click', () => setKitchen(x)));
 $('tSlide').addEventListener('click', e => { state.slide = !state.slide; e.currentTarget.setAttribute('aria-pressed', state.slide); setSlide(state.slide); shadowsDirty(); });
@@ -676,10 +824,10 @@ function moveJoy(e){ const r = joyEl.getBoundingClientRect(); let dx = e.clientX
 // ---------- minimap
 const mini = $('mini'), mg = mini.getContext('2d');
 const B = (() => { let x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9; for (const r of GEO.rooms) for (const [x,z] of r.poly){ x0 = Math.min(x0,x); z0 = Math.min(z0,z); x1 = Math.max(x1,x); z1 = Math.max(z1,z); } return {x0:x0-0.3, z0:z0-0.3, x1:x1+0.3, z1:z1+0.3}; })();
-const NLABEL = {'0,-1':'N ↑', '1,0':'N →', '0,1':'N ↓', '-1,0':'N ←'}[String(GEO.north || [0,-1])] || 'N';
 function miniXf(){ const w = mini.clientWidth, h = mini.clientHeight, s = Math.min((w-8)/(B.x1-B.x0), (h-8)/(B.z1-B.z0)); return {s, ox:(w - s*(B.x1-B.x0))/2 - B.x0*s, oz:(h - s*(B.z1-B.z0))/2 - B.z0*s}; }
 function drawMini(){
   const dpr = Math.min(window.devicePixelRatio||1, 2), w = mini.clientWidth, h = mini.clientHeight;
+  if (w < 20 || h < 20) return;
   if (mini.width !== w*dpr){ mini.width = w*dpr; mini.height = h*dpr; }
   const cs = getComputedStyle(document.documentElement), ink = cs.getPropertyValue('--ink').trim(), acc = cs.getPropertyValue('--accent').trim(), chip = cs.getPropertyValue('--chip').trim();
   const {s, ox, oz} = miniXf(); mg.setTransform(dpr,0,0,dpr,0,0); mg.clearRect(0,0,w,h);
@@ -695,41 +843,21 @@ function drawMini(){
     mg.globalAlpha = .28; mg.beginPath(); mg.moveTo(px, pz); mg.arc(px, pz, 26, a-0.6, a+0.6); mg.closePath(); mg.fill(); mg.globalAlpha = 1;
     mg.beginPath(); mg.arc(px, pz, 3.5, 0, 7); mg.fill();
   }
-  mg.fillStyle = ink; mg.font = '600 10px ' + cs.getPropertyValue('--sans'); mg.fillText(NLABEL, w-28, 12);
+  // flèche du nord vrai, et soleil sur le bord de la vignette (mode Soleil)
+  const nx = w - 20, nz = 21; mg.strokeStyle = ink; mg.fillStyle = ink; mg.lineWidth = 1.3; mg.beginPath(); mg.moveTo(nx - NVT[0]*6, nz - NVT[1]*6); mg.lineTo(nx + NVT[0]*5, nz + NVT[1]*5); mg.stroke();
+  mg.beginPath(); mg.moveTo(nx + NVT[0]*8, nz + NVT[1]*8); mg.lineTo(nx + NVT[0]*3 - NVT[1]*3, nz + NVT[1]*3 + NVT[0]*3); mg.lineTo(nx + NVT[0]*3 + NVT[1]*3, nz + NVT[1]*3 - NVT[0]*3); mg.fill();
+  mg.font = '600 9px ' + cs.getPropertyValue('--sans'); mg.textAlign = 'center'; mg.textBaseline = 'middle'; mg.fillText('N', nx + NVT[0]*14, nz + NVT[1]*14); mg.textAlign = 'start'; mg.textBaseline = 'alphabetic';
+  if (SUN.on && SUN.alt > 0){ const hz = horiz(SUN.az), tt = Math.min((w/2 - 8)/Math.max(Math.abs(hz[0]), 1e-3), (h/2 - 8)/Math.max(Math.abs(hz[1]), 1e-3)), sx = w/2 + hz[0]*tt, sz = h/2 + hz[1]*tt;
+    mg.strokeStyle = '#e0a12e'; mg.fillStyle = '#f2b134'; mg.lineWidth = 1.2; for (let k = 0; k < 8; k++){ const a = k*Math.PI/4; mg.beginPath(); mg.moveTo(sx + Math.cos(a)*6, sz + Math.sin(a)*6); mg.lineTo(sx + Math.cos(a)*8.5, sz + Math.sin(a)*8.5); mg.stroke(); }
+    mg.beginPath(); mg.arc(sx, sz, 4.5, 0, 7); mg.fill(); }
 }
 mini.addEventListener('click', e => {
   const r = mini.getBoundingClientRect(), {s, ox, oz} = miniXf(); const x = (e.clientX - r.left - ox)/s, z = (e.clientY - r.top - oz)/s;
   if (GEO.rooms.some(rm => inPoly(x, z, rm.poly))){ if (state.mode !== 'visit') { state.visited = true; setMode('visit'); } state.x = x; state.z = z; collide(); lastRoom = null; updateRoom(); }
 });
 
-// ---------- photo mode : progressive path tracing (three-gpu-pathtracer) while the camera rests
-const pt = new WebGLPathTracer(renderer);
-pt.renderScale = coarse ? 0.5 : 1; pt.minSamples = 3; pt.renderDelay = 250; pt.fadeDuration = 450; pt.bounces = 5; pt.filterGlossyFactor = 0.5;
-const sky = new GradientEquirectTexture(256);
-const PT_SKY = { day:{top:0x6f9fca, bottom:0xeef1ee, env:1.35, sun:3.2, exp:2.6}, eve:{top:0x5d6f98, bottom:0xf3b27a, env:0.55, sun:4.6, exp:2.0} };
-pt.rasterizeSceneCallback = (sc, cam) => { const e = renderer.toneMappingExposure, si = sun.intensity, P = PRESETS[photo.preset]; renderer.toneMappingExposure = P.exp; sun.intensity = P.sunI; renderer.render(sc, cam); renderer.toneMappingExposure = e; sun.intensity = si; };
-function ptLook(){ const S = PT_SKY[photo.preset]; sky.topColor.set(S.top); sky.bottomColor.set(S.bottom); sky.exponent = 2.2; sky.update(); scene.environmentIntensity = S.env; scene.backgroundIntensity = 1; sun.intensity = S.sun; renderer.toneMappingExposure = S.exp; }
-function photoHint(){ if (photo.on) hint.textContent = photo.ready ? `Mode photo · ${Math.floor(pt.samples)} passes · reste immobile pour affiner` : 'Mode photo · préparation de la scène…'; }
-function buildPT(){
-  if (photo.building) return; photo.building = true; photo.ready = false; photoHint();
-  setTimeout(() => { ptLook(); pt.setScene(scene, camera); photo.ready = true; photo.dirty = false; photo.building = false; photoHint(); }, 40);
-}
-function glassFor(on){
-  Object.assign(M.glass, on ? {transmission:1, opacity:1, transparent:false, roughness:0, ior:1.5, thickness:0.01, depthWrite:true} : {transmission:0, opacity:.2, transparent:true, roughness:.05, depthWrite:false});
-  Object.assign(M.frost, on ? {transmission:1, opacity:1, transparent:false, roughness:.55, ior:1.5, thickness:0.01} : {transmission:0, opacity:.86, transparent:true, roughness:.8});
-  M.glass.needsUpdate = M.frost.needsUpdate = true;
-}
-function setPhoto(on){
-  photo.on = on; $('tPhoto').setAttribute('aria-pressed', on);
-  scene.traverse(o => { if (o.userData.ao) o.visible = !on; });
-  glassFor(on);
-  if (on){ photo.saved = {env:scene.environment, bg:scene.background, fog:scene.fog}; scene.environment = sky; scene.background = sky; scene.fog = null; buildPT(); }
-  else { photo.ready = false; if (photo.saved){ scene.environment = photo.saved.env; scene.background = photo.saved.bg; scene.fog = photo.saved.fog; } applyPreset(photo.preset); setMode(state.mode); }
-}
-$('tPhoto').addEventListener('click', () => setPhoto(!photo.on));
-
 // ---------- loop
-function resize(){ const w = window.innerWidth, h = window.innerHeight; renderer.setSize(w, h, false); camera.aspect = w/h; if (state.mode === 'visit') camera.fov = visitFov(); camera.updateProjectionMatrix(); if (typeof pt !== 'undefined' && photo.ready) pt.updateCamera();
+function resize(){ const w = window.innerWidth, h = window.innerHeight; renderer.setSize(w, h, false); camera.aspect = w/h; if (state.mode === 'visit') camera.fov = visitFov(); camera.updateProjectionMatrix();
   document.documentElement.style.setProperty('--bar-h', $('bar').offsetHeight + 'px'); }
 window.addEventListener('resize', resize); resize();
 // ---------- panneaux repliables, cadrage portrait, indice qui s'efface
@@ -753,7 +881,7 @@ canvas.addEventListener('wheel', () => { autoR = false; }, {passive:true});
 canvas.addEventListener('touchstart', e => { if (e.touches.length > 1) autoR = false; }, {passive:true});
 window.addEventListener('resize', fitOrbit); fitOrbit();
 let hintT;
-function showHint(){ hint.classList.remove('gone'); clearTimeout(hintT); if (!/^Mode photo/.test(hint.textContent)) hintT = setTimeout(() => hint.classList.add('gone'), 6000); }
+function showHint(){ hint.classList.remove('gone'); clearTimeout(hintT); hintT = setTimeout(() => hint.classList.add('gone'), 6000); }
 new MutationObserver(showHint).observe(hint, {childList:true, characterData:true, subtree:true}); showHint();
 let last = performance.now();
 function frame(now){
@@ -776,15 +904,11 @@ function frame(now){
     camera.position.set(target.x + state.radius*sp*Math.sin(state.theta), target.y + state.radius*Math.cos(state.phi), target.z + state.radius*sp*Math.cos(state.theta));
     camera.lookAt(target);
   }
-  if (photo.on){
-    const moving = doors.some(d => d.t !== d.target);
-    if (photo.dirty && !moving && !photo.building) buildPT();
-    if (photo.ready){ camera.updateMatrixWorld(); if (!photo.last.equals(camera.matrixWorld)){ photo.last.copy(camera.matrixWorld); pt.updateCamera(); } pt.renderSample(); if ((++photo.n & 15) === 0) photoHint(); }
-    else renderer.render(scene, camera);
-  } else renderer.render(scene, camera);
+  if (SUN.play) sunTick(dt);
+  renderer.render(scene, camera);
   drawMini();
   requestAnimationFrame(frame);
 }
 setMode('orbit'); requestAnimationFrame(frame);
-window.__lot = window.__a201 = {state, goTo, setMode, doors, toggleDoor, collide, hitDoor, setPhoto, photo, pt, applyPreset};
+window.__lot = window.__a201 = {state, goTo, setMode, doors, toggleDoor, collide, hitDoor, applyPreset, SUN, setSun, applySun, sunPos, bilan: () => BILAN};
 })();

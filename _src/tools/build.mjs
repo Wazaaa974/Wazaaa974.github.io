@@ -56,7 +56,7 @@ function page({ id, geo }, offline) {
   const og = offline ? '' : `
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(title)} · maquette 3D">
-<meta property="og:description" content="${esc(`${m.type} · ${m.facts[1]} · ${m.facts[2]}. Maquette 3D relevée sur le plan de vente : visite pièce par pièce, mode photo, soir d'été.`)}">
+<meta property="og:description" content="${esc(`${m.type} · ${m.facts[1]} · ${m.facts[2]}. Maquette 3D relevée sur le plan de vente : visite pièce par pièce, soleil heure par heure.`)}">
 <meta property="og:url" content="${url}">
 <meta property="og:image" content="${url.replace(/\.html$/, '.jpg')}">
 <meta property="og:image:width" content="1200">

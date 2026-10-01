@@ -1,0 +1,14 @@
+{
+ "base": "a106",
+ "meta": {
+  "name": "A206",
+  "level": 2,
+  "facts": ["T2", "41,0 m²", "R+2", "nord-ouest · balcon"],
+  "src": "Relevé du plan de vente du 07/08/2025 : même plan que l'A106, avec des soffites à 2,20 m sur la salle d'eau et sur la partie cuisine / entrée du séjour (cotés sur le plan). Meubles d'esprit bord de mer aux cotes standard : lit 160 × 200, canapé 240 × 92, table Ø 90."
+ },
+ "soffits": [
+  [6.473, 1.261, 9.201, 2.667, 2.2],
+  [8.009, 0.359, 9.201, 1.261, 2.2],
+  [6.496, 3.546, 9.209, 7.039, 2.2]
+ ]
+}

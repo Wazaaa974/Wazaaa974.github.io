@@ -1,6 +1,7 @@
 """Contrôle visuel d'un relevé : murs (rouge), ouvertures (bleu), soffites (hachures vertes) et pièces
 superposés au plan de vente d'origine, après recalage automatique échelle + décalage.
-usage: python3 tools/overlay.py out/geo/<lot>.json <plan.png> <sortie.png> [px_par_m_approx]"""
+usage: python3 tools/overlay.py out/geo/<lot>.json <plan.png> <sortie.png> [px_par_m_approx] [origine_x_px origine_z_px]
+(l'origine, donnée par releve.py, évite de se recaler sur un autre dessin du plan, comme une coupe)"""
 import cv2, numpy as np, json, sys
 
 def wallmask(im):
@@ -17,11 +18,11 @@ def render(rects, s, ox, oz, shape):
 def iou(walls, s, ox, oz, mask):
     r = render(walls, s, ox, oz, mask.shape); inter = (r & mask).sum(); return inter / (r.sum() + mask.sum() - inter + 1)
 
-def fit(walls, mask, s0):
+def fit(walls, mask, s0, seed=None):
     ys, xs = np.nonzero(mask); best = (0, None)
     wx0 = min(w[0] for w in walls); wz0 = min(w[1] for w in walls)
     for s in np.arange(s0 - 5, s0 + 5, 0.5):
-        ox0 = xs.min() - wx0*s; oz0 = ys.min() - wz0*s
+        ox0, oz0 = seed if seed else (xs.min() - wx0*s, ys.min() - wz0*s)
         for dx in range(-30, 31, 3):
             for dz in range(-30, 31, 3):
                 sc = iou(walls, s, ox0+dx, oz0+dz, mask)
@@ -38,7 +39,7 @@ def fit(walls, mask, s0):
 
 if __name__ == '__main__':
     geo = json.load(open(sys.argv[1])); im = cv2.imread(sys.argv[2], cv2.IMREAD_GRAYSCALE)
-    sc, s, ox, oz = fit(geo['walls'], wallmask(im), float(sys.argv[4]) if len(sys.argv) > 4 else 131)
+    sc, s, ox, oz = fit(geo['walls'], wallmask(im), float(sys.argv[4]) if len(sys.argv) > 4 else 131, (float(sys.argv[5]), float(sys.argv[6])) if len(sys.argv) > 6 else None)
     P = lambda x, z: (int(round(ox + x*s)), int(round(oz + z*s)))
     col = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR); ov = col.copy()
     ov[render(geo['walls'], s, ox, oz, im.shape) > 0] = (40, 40, 220)

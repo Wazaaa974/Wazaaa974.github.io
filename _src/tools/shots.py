@@ -9,13 +9,13 @@ async def main():
         ctx = await b.new_context(viewport={"width": 1100, "height": 680}, offline=True); pg = await ctx.new_page(); errs = []
         pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
         await pg.goto("file://" + page); await pg.wait_for_timeout(3000)
-        await pg.screenshot(path=f"{pre}_orbit.png")
+        await pg.screenshot(timeout=120000, path=f"{pre}_orbit.png")
         for r in rooms:
             await pg.evaluate(f"window.__lot.goTo({r!r})"); await pg.wait_for_timeout(900)
             info = await pg.evaluate("document.getElementById('roomName').textContent + ' · ' + document.getElementById('hsp').textContent")
-            await pg.screenshot(path=f"{pre}_{r.replace(' ', '_').replace(chr(39), '')}.png"); print(r, '→', info)
+            await pg.screenshot(timeout=120000, path=f"{pre}_{r.replace(' ', '_').replace(chr(39), '')}.png"); print(r, '→', info)
         await ctx.close()
         ctx = await b.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, offline=True); pg = await ctx.new_page()
-        await pg.goto("file://" + page); await pg.wait_for_timeout(3000); await pg.screenshot(path=f"{pre}_mobile.png")
+        await pg.goto("file://" + page); await pg.wait_for_timeout(3000); await pg.screenshot(timeout=120000, path=f"{pre}_mobile.png")
         print("erreurs:", errs[:3]); await b.close()
 asyncio.run(main())

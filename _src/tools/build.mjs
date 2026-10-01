@@ -27,8 +27,8 @@ const lots = Object.keys(raw).sort().map(id => ({ id, geo: resolve(id) }));
 const area = p => Math.abs(p.reduce((s, [x, z], i) => { const [x2, z2] = p[(i + 1) % p.length]; return s + x * z2 - x2 * z; }, 0)) / 2;
 let bad = 0;
 for (const { id, geo } of lots) for (const r of geo.rooms) {
-  const a = area(r.poly), e = Math.abs(a - r.plan);
-  if (e > Math.max(0.2, r.plan * 0.01)) { bad++; console.warn(`  ⚠ ${id} · ${r.name} : ${a.toFixed(2)} m² relevés pour ${r.plan} m² au plan`); }
+  const a = area(r.poly), t = r.plan + (r.low || 0), e = Math.abs(a - t);   // low : surface sous 1,80 m, hors surface habitable
+  if (e > Math.max(0.2, t * 0.01)) { bad++; console.warn(`  ⚠ ${id} · ${r.name} : ${a.toFixed(2)} m² relevés pour ${t} m² au plan`); }
 }
 
 // ---------- moteur : empaqueté une seule fois

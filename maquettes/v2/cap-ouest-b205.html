@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>B205 Cap Ouest</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="B205 Cap Ouest · maquette 3D">
+<meta property="og:description" content="T2 · 43,5 m² · R+2. Maquette 3D relevée sur le plan de vente : visite pièce par pièce, mode photo, soir d'été.">
+<meta property="og:url" content="https://wazaaa974.github.io/maquettes/v2/cap-ouest-b205.html">
+<meta property="og:image" content="https://wazaaa974.github.io/maquettes/v2/cap-ouest-b205.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#e7ecea; --panel:rgba(249,250,248,.93); --ink:#1b2420; --muted:#58675f; --line:rgba(27,36,32,.13);
+  --accent:#1d7a76; --accent-ink:#ffffff; --chip:#eef2f0; --shadow:0 8px 28px rgba(20,32,28,.16);
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; --sans:"Jost","Avenir Next","Century Gothic",system-ui,sans-serif;
+  --bar-h:64px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --bg:#111715; --panel:rgba(21,28,26,.9); --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.45); }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --bg:#111715; --panel:rgba(21,28,26,.9); --ink:#e5ede9; --muted:#9aaea5; --line:rgba(229,237,233,.14); --accent:#5cc6c1; --accent-ink:#0c1513; --chip:#1c2623; --shadow:0 8px 28px rgba(0,0,0,.45); }
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{position:fixed;inset:0}
+#scene{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+#scene:active{cursor:grabbing}
+.card{position:absolute;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.id{top:calc(env(safe-area-inset-top,0px) + 16px);left:16px;padding:12px 14px;display:grid;gap:6px;max-width:min(300px,calc(100% - 190px))}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.id h1{margin:0;font-weight:600;font-size:30px;line-height:1;letter-spacing:.02em}
+.facts{display:flex;flex-wrap:wrap;gap:4px}
+.facts span{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--ink)}
+.where{display:flex;align-items:baseline;gap:8px;padding-top:6px;border-top:1px solid var(--line);font-weight:500;font-size:15px}
+.where .mono{font-size:12px;color:var(--muted)}
+.hsp{font-size:11px;color:var(--muted)}
+.src{font-size:10.5px;color:var(--muted);line-height:1.35}
+.map{top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;padding:8px}
+#mini{display:block;width:170px;height:104px;cursor:pointer}
+.bar{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);padding:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:max-content;max-width:calc(100% - 32px);box-sizing:border-box}
+.seg{display:flex;background:var(--chip);border-radius:9px;padding:3px;gap:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:7px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.chips{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;border:1px solid var(--line);background:transparent;padding:6px 10px;border-radius:999px;font-size:13px}
+.chips button.here{border-color:var(--accent);color:var(--accent)}
+.toggles{display:flex;gap:4px;flex-wrap:wrap}
+.tog{border:1px solid var(--line);background:transparent;padding:6px 10px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:6px}
+.tog::before{content:"";width:9px;height:9px;border-radius:3px;border:1.5px solid var(--muted)}
+.tog[aria-pressed="true"]::before{background:var(--accent);border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + var(--bar-h) + 26px);margin:0;padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--muted);white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+#joy{position:absolute;left:24px;bottom:calc(env(safe-area-inset-bottom,0px) + var(--bar-h) + 60px);width:104px;height:104px;border-radius:50%;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);touch-action:none}
+#knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--accent);opacity:.9}
+@media (max-width:560px){
+  .id{padding:10px 12px;max-width:calc(100% - 170px)}
+  .id h1{font-size:24px}
+  .src{display:none}
+  #mini{width:128px;height:80px}
+  .bar{justify-content:center}
+}
+/* ---------- panneaux repliables (mobile) ---------- */
+.id{z-index:2;-webkit-tap-highlight-color:transparent}
+.bar button,.fold{-webkit-tap-highlight-color:transparent}
+.id-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.id-title{display:grid;gap:6px;min-width:0}
+.id-name{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.id-sub{display:none;font-size:12px;color:var(--muted)}
+.fold{flex:none;display:grid;place-items:center;width:30px;height:30px;margin:-2px -4px 0 0;padding:0;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted)}
+.fold svg{transition:transform .2s ease}
+.id.is-collapsed{padding:8px 8px 8px 12px;gap:3px;cursor:pointer}
+.id.is-collapsed .fold svg{transform:rotate(180deg)}
+.id.is-collapsed .eyebrow,.id.is-collapsed .facts,.id.is-collapsed .hsp,.id.is-collapsed .src{display:none}
+.id.is-collapsed h1{font-size:22px}
+.id.is-collapsed .id-sub{display:inline}
+.id.is-collapsed .where{padding-top:4px;font-size:13px;min-width:0}
+.id.is-collapsed .where span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.id.is-collapsed .where .mono{flex:none;max-width:45%}
+.opts{display:none;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;padding:7px 11px;border-radius:9px;font-size:13px;font-weight:500}
+.opts[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.hint{transition:opacity .4s ease}
+.hint.gone{opacity:0;pointer-events:none}
+@media (max-width:560px), (max-height:520px){
+  .opts{display:flex}
+  .bar:not(.opts-open) .toggles{display:none}
+  .toggles{width:100%}
+}
+@media (max-width:560px){
+  .id.is-collapsed{max-width:calc(100% - 32px - 156px)}
+  .id:not(.is-collapsed){max-width:calc(100% - 32px)}
+  .bar{width:calc(100% - 32px);padding:6px;gap:6px}
+  .bar > .seg{order:1}
+  .opts{order:2;margin-left:auto}
+  .chips{order:3;width:100%}
+  .toggles{order:4}
+  .hint{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app">
+  <canvas id="scene" tabindex="0" aria-label="Appartement B205 en 3D"></canvas>
+
+  <header class="card id" id="info">
+    <div class="id-top">
+      <div class="id-title">
+        <div class="eyebrow" id="mEye"></div>
+        <div class="id-name"><h1 id="mName"></h1><span class="id-sub mono" id="idSub"></span></div>
+      </div>
+      <button class="fold" id="infoToggle" type="button" aria-expanded="true" aria-controls="info" aria-label="Replier les informations"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 10 8 5.5 12.5 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="facts" id="mFacts"></div>
+    <div class="where"><span id="roomName">Vue d'ensemble</span><span id="roomArea" class="mono"></span></div>
+    <div id="hsp" class="hsp mono"></div>
+    <div class="src" id="mSrc"></div>
+  </header>
+
+  <aside class="card map" aria-label="Plan de situation"><canvas id="mini"></canvas></aside>
+
+  <div id="joy" hidden aria-hidden="true"><div id="knob"></div></div>
+  <p id="hint" class="hint">Glisse pour tourner · clic sur une porte pour l’ouvrir</p>
+
+  <nav id="bar" class="card bar" aria-label="Commandes">
+    <div class="seg">
+      <button id="bOrbit" aria-pressed="true">Maquette</button>
+      <button id="bVisit" aria-pressed="false">Visite</button>
+    </div>
+    <div id="chips" class="chips"></div>
+    <button id="bOpts" class="opts" type="button" aria-expanded="true" aria-controls="toggles"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.5" cy="4.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5.5" cy="11.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Options</button>
+    <div class="toggles" id="toggles">
+      <button id="tCeil" class="tog" aria-pressed="true" hidden>Plafond</button>
+      <button id="tPhoto" class="tog" aria-pressed="false">Mode photo</button>
+      <button id="tEve" class="tog" aria-pressed="false">Soir d’été</button>
+      <button id="tFurn" class="tog" aria-pressed="true">Meubles</button>
+      <button id="tSlide" class="tog" aria-pressed="true" title="Portes coulissantes suspendues pour la chambre et la salle d’eau">Portes coulissantes</button>
+      <div class="seg" role="group" aria-label="Cuisine" id="kitSeg"><button id="k0" aria-pressed="false">Sans cuisine</button><button id="kA" aria-pressed="true">Cuisine A</button><button id="kB" aria-pressed="false">B colonnes</button></div>
+    </div>
+  </nav>
+</div>
+<script>window.GEO = {"meta":{"name":"B205","building":"B","level":2,"type":"T2","eyebrow":"Cap Ouest · Carcans · Bât. B","facts":["T2","43,5 m²","R+2","est · balcon 19 m²"],"overview":"43,5 m² hab. + 20,8 m² ext.","src":"Relevé du plan de vente du 07/08/2025, écart < 1,5 cm sur les cotes. Soffite sur la salle d'eau, hauteur non cotée sur le plan : prise à 2,25 m. Meubles d'esprit bord de mer aux cotes standard : lit 160 × 200, canapé 240 × 92, table Ø 90.","kitchenPrice":"4 956 € pour un T2"},"ceiling":2.5,"soffitH":2.25,"soffits":[[11.204,0.191,14.826,1.735,2.25]],"north":[1,0],"walls":[[0,5.01,1.506,5.151],[0,5.151,4.868,5.38],[4.44,3.37,5.334,3.699],[4.44,3.699,4.769,5.01],[4.44,5.01,4.815,5.151],[5.013,0.405,8.04,0.481],[5.013,0.481,8.605,0.585],[5.013,0.585,5.319,1.269],[5.013,1.269,6.091,1.372],[5.013,1.372,5.334,3.37],[5.984,0.585,6.091,1.269],[6.878,0.585,6.962,1.372],[7.253,5.151,9.939,5.38],[7.306,5.01,9.889,5.151],[7.856,0,8.697,0.187],[7.856,0.187,8.04,0.405],[8.177,0.604,8.269,1.196],[8.177,1.196,8.605,1.292],[8.498,0.187,8.605,0.481],[8.75,5.38,8.942,5.541],[8.75,6.435,8.942,7.604],[8.75,7.604,9.939,7.795],[9.69,0,15.017,0.187],[9.744,5.38,9.939,7.604],[9.966,0.187,10.034,0.787],[10.833,5.151,12.896,5.38],[10.833,5.403,12.896,5.441],[10.883,5.01,12.847,5.151],[11.131,0.187,11.204,0.848],[11.131,1.735,15.017,1.815],[11.131,1.815,11.204,1.949],[11.131,2.835,11.204,5.01],[13.787,5.151,15.017,5.357],[13.84,5.01,15.017,5.151],[13.932,0.187,14.031,0.451],[13.932,0.451,15.017,0.562],[14.83,1.815,15.017,5.01],[14.83,0.187,15.017,0.451],[14.83,0.562,15.017,1.735],[5.319,0.585,5.984,1.269],[8.177,0.585,8.605,1.292],[13.932,0.187,14.83,0.451],[4.815,5.01,4.868,5.151],[7.253,5.01,7.306,5.151],[9.889,5.01,9.939,5.151],[10.833,5.01,10.883,5.151],[12.847,5.01,12.896,5.151],[13.787,5.01,13.84,5.151]],"openings":[{"id":"pf","type":"window","kind":"pf","r":[4.868,5.006,7.253,5.38],"head":2.15,"sill":0,"panes":[{"a":[4.868,5.193],"b":[5.65,5.193],"y0":0.02,"y1":2.15,"frost":false}],"block":[4.868,5.006,5.65,5.38]},{"id":"f_sej","type":"window","kind":"fav","r":[9.943,5.006,10.829,5.38],"head":2.15,"sill":0,"panes":[{"a":[9.943,5.193],"b":[10.829,5.193],"y0":0.02,"y1":1,"frost":true},{"a":[9.943,5.193],"b":[10.829,5.193],"y0":1,"y1":2.15,"frost":false}]},{"id":"f_ch","type":"window","kind":"fav","r":[12.9,5.006,13.787,5.38],"head":2.15,"sill":0,"panes":[{"a":[12.9,5.193],"b":[13.787,5.193],"y0":0.02,"y1":1,"frost":true},{"a":[12.9,5.193],"b":[13.787,5.193],"y0":1,"y1":2.15,"frost":false}]},{"id":"entree","type":"door","kind":"entry","r":[8.697,0,9.69,0.183],"head":2.04,"sill":0},{"id":"ch","type":"door","kind":"door","r":[11.135,1.949,11.204,2.835],"head":2.04,"sill":0},{"id":"sde","type":"door","kind":"door","r":[11.127,0.848,11.204,1.735],"head":2.04,"sill":0},{"id":"cellier","type":"door","kind":"door","r":[8.75,5.541,8.942,6.435],"head":2.04,"sill":0}],"doors":[{"id":"entree","hinge":[8.74,0.1],"closed":[9.64,0.1],"open":[8.74,1],"isOpen":false,"kind":"entry"},{"id":"ch","hinge":[11.17,1.98],"closed":[11.17,2.8],"open":[11.99,1.98],"isOpen":true,"kind":"door"},{"id":"sde","hinge":[11.17,1.7],"closed":[11.17,0.88],"open":[11.99,1.7],"isOpen":true,"kind":"door"},{"id":"cellier","hinge":[8.846,5.58],"closed":[8.846,6.4],"open":[8.03,5.58],"isOpen":false,"kind":"door"},{"id":"becs","hinge":[6.1,1.32],"closed":[6.85,1.32],"open":[6.72,1.76],"isOpen":false,"kind":"door"},{"id":"placard","hinge":[11.1,0.8],"closed":[10.08,0.8],"open":[10.2,1.33],"isOpen":false,"kind":"door"},{"id":"pf1","hinge":[5.65,5.19],"closed":[6.42,5.19],"open":[5.65,4.42],"isOpen":true,"kind":"glass","pair":"pf","head":2.14},{"id":"pf2","hinge":[7.2,5.19],"closed":[6.43,5.19],"open":[7.2,4.42],"isOpen":true,"kind":"glass","pair":"pf","head":2.14}],"slides":[],"rooms":[{"name":"Séjour / Cuisine","plan":26.5,"floor":"vinyl","ext":false,"poly":[[5.334,1.376],[6.091,1.376],[6.091,1.32],[6.878,1.32],[6.878,0.581],[8.177,0.581],[8.177,1.292],[8.605,1.292],[8.605,0.183],[11.135,0.183],[11.135,5.006],[10.883,5.006],[10.883,5.143],[9.889,5.143],[9.889,5.006],[7.306,5.006],[7.306,5.143],[4.815,5.143],[4.815,5.006],[4.769,5.006],[4.769,3.699],[5.334,3.699]],"calc":26.4},{"name":"Chambre","plan":11.6,"floor":"vinyl","ext":false,"poly":[[11.204,1.811],[14.826,1.811],[14.826,5.006],[11.204,5.006]],"calc":11.57},{"name":"Salle d'eau","plan":5.4,"floor":"tile","ext":false,"poly":[[11.204,0.191],[13.932,0.191],[13.932,0.558],[14.826,0.558],[14.826,1.735],[11.204,1.735]],"calc":5.26},{"name":"Balcon","plan":19,"floor":"deck","ext":true,"poly":[[0.4,5.38],[8.75,5.38],[8.75,7.66],[0.4,7.66]],"calc":19.04},{"name":"Cellier","plan":1.8,"floor":"concrete","ext":true,"poly":[[8.942,5.38],[9.744,5.38],[9.744,7.604],[8.942,7.604]],"calc":1.78}],"posts":[[0.42,5.5],[0.42,6.55],[0.42,7.64],[1.45,7.64],[2.47,7.64],[3.5,7.64],[4.52,7.64],[5.55,7.64],[6.57,7.64],[7.6,7.64],[8.62,7.64]],"rails":[[0.4,7.6,8.75,7.68],[0.36,5.38,0.44,7.6]],"kit":{"runs":[{"r":[6.962,0.581,7.55,1.2],"wall":"n"},{"r":[5.334,1.376,5.95,2.58],"wall":"w","upper":true}],"tall":[[7.55,0.581,8.177,1.2]],"hob":[6.98,0.63,7.5,1.15],"sink":[5.38,1.45,5.9,1.95],"sinkWall":"w","hood":[6.97,0.581,7.52,0.9]},"bath":{"wc":{"r":[12.08,0.191,12.5,0.82],"back":"n"},"shower":{"r":[13.96,0.558,14.826,1.735],"screen":[13.945,0.56,13.975,1.25],"bar":[14.79,0.9,14.81,0.92]},"vanity":{"r":[11.204,0.191,11.85,0.68],"back":"n","basins":[[11.54,0.44]]},"washer":{"r":[5.34,2.6,5.95,3.17],"front":"e"},"tiles":[{"a":[14.826,0.558],"b":[14.826,1.735],"n":[-1,0]},{"a":[13.96,0.558],"b":[14.826,0.558],"n":[0,1]}],"mirror":{"a":[11.25,0.191],"b":[11.8,0.191],"n":[0,1],"y0":1.05,"y1":1.85}},"becs":[6.5,0.93],"views":{"Entrée":{"p":[9.2,0.8],"look":[6,4.5]},"Séjour":{"p":[10.6,1.4],"look":[5.5,4.6]},"Cuisine":{"p":[7.5,4],"look":[6,1],"pitch":-0.14},"Canapé":{"p":[8.3,3.8],"look":[12,3.8]},"Chambre":{"p":[11.6,2.6],"look":[14.6,4.5]},"Salle d'eau":{"p":[11.6,1.5],"look":[14.5,0.6],"pitch":-0.25},"Balcon":{"p":[2,5.7],"look":[5,12]}},"curtains":[{"a":[4.8,4.906],"b":[5,4.906]},{"a":[7.25,4.906],"b":[7.6,4.906]},{"a":[9.7,4.906],"b":[9.95,4.906]},{"a":[10.82,4.906],"b":[11.07,4.906]},{"a":[12.65,4.906],"b":[12.9,4.906]},{"a":[13.79,4.906],"b":[14.04,4.906]}],"rods":[{"a":[4.78,4.906],"b":[7.65,4.906]},{"a":[9.65,4.906],"b":[11.12,4.906]},{"a":[12.6,4.906],"b":[14.09,4.906]}],"furn":[{"t":"rug","r":[9,2.9,10.5,4.7],"nomap":true},{"t":"sofa","r":[7.85,2.6,8.77,5],"dir":"w"},{"t":"coffee","c":[9.65,3.8],"rad":0.4},{"t":"tvunit","r":[10.8,3.2,11.135,4.4],"dir":"w"},{"t":"art","pos":[11.125,1.55,3.8],"ry":-1.5708,"w":1,"h":0.62,"motif":"sea","nomap":true},{"t":"floorlamp","c":[8.05,2.35],"nomap":true},{"t":"palm","c":[4.98,4.72],"rad":0.23},{"t":"round","c":[6.4,3],"rad":0.45},{"t":"chair","c":[6.4,2.35],"face":[6.4,3]},{"t":"chair","c":[6.4,3.65],"face":[6.4,3]},{"t":"chair","c":[5.75,3],"face":[6.4,3]},{"t":"chair","c":[7.05,3],"face":[6.4,3]},{"t":"pendant","c":[6.4,3],"nomap":true},{"t":"bed","r":[12.8,2.75,14.826,4.35]},{"t":"night","c":[14.6,2.52],"rad":0.2},{"t":"night","c":[14.6,4.58],"rad":0.2},{"t":"art","pos":[14.816,1.58,3.55],"ry":-1.5708,"w":1,"h":0.5,"motif":"dunes","nomap":true},{"t":"wardrobe","r":[11.204,3.2,11.79,4.8],"dir":"e"},{"t":"towel","r":[12.6,1.681,13.2,1.735],"dir":"s","nomap":true},{"t":"bathmat","r":[13.3,0.95,13.9,1.55],"nomap":true},{"t":"outrug","r":[2,5.7,4,7.2],"nomap":true},{"t":"round","c":[3,6.45],"rad":0.3,"h":0.72,"wood":"teak"},{"t":"chair","c":[3,5.9],"face":[3,6.45],"plain":true},{"t":"chair","c":[3,7],"face":[3,6.45],"plain":true},{"t":"lounger","r":[5,6.75,6.9,7.35]},{"t":"olive","c":[8.3,5.75],"rad":0.2},{"t":"olive","c":[0.85,5.8],"rad":0.2},{"t":"garland","nomap":true,"a":[0.42,7.57],"b":[8.62,7.57],"spans":[0.42,1.45,2.47,3.5,4.52,5.55,6.57,7.6,8.62]}],"mass":[[15.017,-12,35,5.38],[-20,-12,4.44,5.013],[4.44,-12,15.017,0]],"center":[9.5,3.2],"forest":{"origin":[7.5,7.66],"d0":16,"d1":80,"lat0":-40,"lat1":40,"dir":[0,1]}};</script>
+<script type="module" src="moteur.js?v=2d5d0af2"></script>
+</body>
+</html>

@@ -8,10 +8,25 @@ const GEO = window.GEO;
 (function(){
 const H = GEO.ceiling, TOP = H + 0.22, EYE = 1.65, R = 0.22, GROUND = GEO.ground ?? -(GEO.meta.level ?? 2) * 2.95;
 const fmtM = n => n.toFixed(2).replace('.', ',');
+const OBST = GEO.obst ? GEO.obst.map(o => o.r) : [...GEO.walls, ...(GEO.rails || []), ...(GEO.screens || []).map(s => s.r),
+  ...GEO.openings.filter(o => o.type === 'window' || o.kind === 'entry').map(o => o.block || o.r)];
 const SOFF = (GEO.soffits || []).map(s => Array.isArray(s) ? {r: s.slice(0, 4), h: s[4] ?? GEO.soffitH} : {r: s.r, h: s.h ?? GEO.soffitH});
+// rampants (sous toiture) : pans rectangulaires, hauteur h0 sur la ligne edge, pente vers l'intérieur, plafond plat à cap
+const ROOF = GEO.roof || {}, PANS = ROOF.pans || [], LOWH = ROOF.low ?? 1.8;
+const panT = (p, x, z) => p.dir === 'n' ? z - p.edge : p.dir === 's' ? p.edge - z : p.dir === 'w' ? x - p.edge : p.edge - x;
+const panH = (p, x, z) => Math.min(p.cap ?? H, p.h0 + p.slope * panT(p, x, z));
+const panAt = (x, z) => PANS.find(p => x > p.r[0] && x < p.r[2] && z > p.r[1] && z < p.r[3]);
+const ceilAt = (x, z) => { const p = panAt(x, z); return p ? panH(p, x, z) : H; };
+const panLine = (p, h) => p.edge + (p.dir === 'n' || p.dir === 'w' ? 1 : -1) * (h - p.h0) / p.slope;   // où le pan atteint la hauteur h
+const panAxis = p => p.dir === 'n' || p.dir === 's' ? 'z' : 'x';
+const LOWR = PANS.map(p => { const v = panLine(p, LOWH), r = p.r.slice();            // bande où l'on ne tient pas debout (< 1,80 m)
+  if (p.dir === 'n') r[3] = Math.min(r[3], v); else if (p.dir === 's') r[1] = Math.max(r[1], v); else if (p.dir === 'w') r[2] = Math.min(r[2], v); else r[0] = Math.max(r[0], v);
+  return r; }).filter(r => r[2] > r[0] && r[3] > r[1]);
+OBST.push(...(GEO.obst ? [] : LOWR));
 const $ = id => document.getElementById(id);
 const META = GEO.meta; $('mEye').textContent = META.eyebrow; $('mName').textContent = META.name; $('mFacts').innerHTML = META.facts.map(x => `<span>${x}</span>`).join('');
-$('mSrc').textContent = META.src; $('hsp').textContent = 'Sous plafond ' + fmtM(GEO.ceiling) + ' m' + (SOFF.length ? ' · soffite ' + [...new Set(SOFF.map(s => fmtM(s.h)))].join(' / ') + ' m' : '') + ' · portes 2,04 m';
+$('mSrc').textContent = META.src; $('hsp').textContent = 'Sous plafond ' + fmtM(GEO.ceiling) + ' m' + (SOFF.length ? ' · soffite ' + [...new Set(SOFF.map(s => fmtM(s.h)))].join(' / ') + ' m' : '')
+  + (PANS.length ? ' · rampants ' + fmtM(Math.min(...PANS.map(p => p.h0))) + ' → ' + fmtM(Math.max(...PANS.map(p => p.cap ?? H))) + ' m' : ' · portes 2,04 m');
 $('kitSeg').title = 'Aucun meuble de cuisine fourni de base : option Teisseire à ' + META.kitchenPrice;
 const canvas = $('scene');
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
@@ -83,6 +98,32 @@ function flat(poly, y, m, parent, up = true){
   const g = new THREE.ShapeGeometry(shapeOf(poly, up)); const me = new THREE.Mesh(g, m);
   me.rotation.x = up ? -Math.PI/2 : Math.PI/2; me.position.y = y; parent.add(me); return me;
 }
+// pavé dont le dessous et le dessus suivent yb(x,z) et yt(x,z) aux quatre coins (murs et plafonds sous rampant)
+function hexa(c, yb, yt, m, parent){
+  const [x0,z0,x1,z1] = c, P = [[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
+  const B = P.map(([x,z]) => [x, Math.min(yb(x,z), yt(x,z)), z]), T = P.map(([x,z]) => [x, yt(x,z), z]);
+  const pos = [], uv = [];
+  for (const q of [[T[0],T[3],T[2],T[1]], [B[0],B[1],B[2],B[3]], [B[0],T[0],T[1],B[1]], [B[1],T[1],T[2],B[2]], [B[2],T[2],T[3],B[3]], [B[3],T[3],T[0],B[0]]])
+    for (const v of [q[0],q[1],q[2],q[0],q[2],q[3]]){ pos.push(v[0], v[1], v[2]); uv.push(v[0] + v[2], v[1]); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.computeVertexNormals();
+  const me = new THREE.Mesh(g, m); parent.add(me); return me;
+}
+// découpe un rectangle selon les lignes de rupture des rampants (bords des pans, début du plafond plat, ligne des 1,80 m)
+function gridCells(x0, z0, x1, z1, exX = [], exZ = []){
+  const xs = new Set([x0, x1, ...exX]), zs = new Set([z0, z1, ...exZ]);
+  for (const p of PANS){ xs.add(p.r[0]); xs.add(p.r[2]); zs.add(p.r[1]); zs.add(p.r[3]); for (const h of [p.cap ?? H, LOWH]) (panAxis(p) === 'z' ? zs : xs).add(panLine(p, h)); }
+  const X = [...xs].filter(v => v >= x0 && v <= x1).sort((a,b) => a-b), Z = [...zs].filter(v => v >= z0 && v <= z1).sort((a,b) => a-b), out = [];
+  for (let i = 0; i < X.length-1; i++) for (let j = 0; j < Z.length-1; j++) if (X[i+1]-X[i] > 1e-4 && Z[j+1]-Z[j] > 1e-4) out.push([X[i], Z[j], X[i+1], Z[j+1]]);
+  return out;
+}
+const cellFn = c => { const p = panAt((c[0]+c[2])/2, (c[1]+c[3])/2); return p ? (x, z) => panH(p, x, z) : () => H; };
+const touchesPan = r => PANS.some(p => r[0] < p.r[2] && r[2] > p.r[0] && r[1] < p.r[3] && r[3] > p.r[1]);
+// mur ou linteau : de y0 jusqu'au-dessus du plafond (+0,22 m de dalle), en suivant les rampants ; chapeau sombre en vue maquette
+function solid(r, y0, m, parent = groups.walls){
+  if (!touchesPan(r)){ box(r[0], r[1], r[2], r[3], y0, TOP, m, parent); box(r[0], r[1], r[2], r[3], TOP, TOP + 0.01, M.cap, groups.caps); return; }
+  for (const c of gridCells(...r)){ const f = cellFn(c); if ([[c[0],c[1]],[c[2],c[1]],[c[2],c[3]],[c[0],c[3]]].every(([x,z]) => f(x,z) + 0.22 <= y0)) continue;
+    hexa(c, () => y0, (x,z) => f(x,z) + 0.22, m, parent); hexa(c, (x,z) => f(x,z) + 0.22, (x,z) => f(x,z) + 0.23, M.cap, groups.caps); }
+}
 
 // ---------- floors, slabs, ceilings
 for (const r of GEO.rooms){
@@ -90,13 +131,63 @@ for (const r of GEO.rooms){
   flat(r.poly, 0.002, fm, groups.walls);
   const slab = new THREE.Mesh(new THREE.ExtrudeGeometry(shapeOf(r.poly, true), {depth:0.22, bevelEnabled:false}), M.slab);
   slab.rotation.x = -Math.PI/2; slab.position.y = -0.22; groups.walls.add(slab);
-  const top = slab.clone(); top.position.y = H; groups.ceil.add(top);
-  if (r.floor !== 'deck') flat(r.poly, H - 0.002, M.ceil, groups.ceil, false);
+  if (!touchesPan(polyBox(r.poly))){
+    const top = slab.clone(); top.position.y = H; groups.ceil.add(top);
+    if (r.floor !== 'deck') flat(r.poly, H - 0.002, M.ceil, groups.ceil, false);
+  }
 }
 for (const s of SOFF) box(s.r[0], s.r[1], s.r[2], s.r[3], s.h, H, M.ceil, groups.ceil);
 
+// ---------- sous toiture : plafonds en rampant, retombées, fenêtres de toit, zone < 1,80 m hachurée au sol
+function polyBox(p){ return [Math.min(...p.map(v => v[0])), Math.min(...p.map(v => v[1])), Math.max(...p.map(v => v[0])), Math.max(...p.map(v => v[1]))]; }
+const SKY = (ROOF.skylights || []).map(s => s.r || s), LOWCELLS = [];
+const inRect = (r, x, z) => x > r[0] && x < r[2] && z > r[1] && z < r[3];
+const inRoom = (x, z, ext = false) => GEO.rooms.some(r => (ext || !r.ext) && inPolyG(x, z, r.poly));
+function inPolyG(x, z, p){ let c = false; for (let i = 0, j = p.length-1; i < p.length; j = i++){ const [xi,zi] = p[i], [xj,zj] = p[j]; if ((zi > z) !== (zj > z) && x < (xj-xi)*(z-zi)/(zj-zi) + xi) c = !c; } return c; }
+if (PANS.length) (function(){
+  const hatchT = tex(128, 0.32, (c, S) => { c.clearRect(0,0,S,S); c.strokeStyle = 'rgba(184,106,75,.55)'; c.lineWidth = S*0.09;
+    for (let k = -1; k <= 1; k++){ c.beginPath(); c.moveTo(k*S, S); c.lineTo(k*S + S, 0); c.stroke(); } });
+  const hatchM = new THREE.MeshBasicMaterial({map:hatchT, transparent:true, depthWrite:false, color:0xffffff});
+  const quadY = (c, y, m, parent) => { const g = new THREE.PlaneGeometry(c[2]-c[0], c[3]-c[1]); g.rotateX(-Math.PI/2); g.translate((c[0]+c[2])/2, y, (c[1]+c[3])/2);
+    const uv = g.attributes.uv, p = g.attributes.position; for (let i = 0; i < uv.count; i++) uv.setXY(i, p.getX(i), -p.getZ(i)); const me = new THREE.Mesh(g, m); parent.add(me); return me; };
+  for (const r of GEO.rooms){
+    const bb = polyBox(r.poly); if (!touchesPan(bb)) continue;
+    const ex = [...r.poly.map(v => v[0]), ...SKY.flatMap(s => [s[0], s[2]])], ez = [...r.poly.map(v => v[1]), ...SKY.flatMap(s => [s[1], s[3]])];
+    for (const c of gridCells(...bb, ex, ez)){
+      const cx = (c[0]+c[2])/2, cz = (c[1]+c[3])/2; if (!inPolyG(cx, cz, r.poly)) continue;
+      const f = cellFn(c);
+      if (!SKY.some(s => inRect(s, cx, cz))) hexa(c, (x,z) => f(x,z) - 0.002, (x,z) => f(x,z) + 0.2, M.ceil, groups.ceil);
+      if (!r.ext && f(c[0],c[1]) <= LOWH + 1e-6 && f(c[2],c[3]) <= LOWH + 1e-6 && f(c[0],c[3]) <= LOWH + 1e-6 && f(c[2],c[1]) <= LOWH + 1e-6){
+        const h = quadY(c, 0.004, hatchM, groups.walls); h.userData.ao = true; h.renderOrder = 2; LOWCELLS.push(c); }
+    }
+  }
+  // retombées : faces verticales là où deux plafonds voisins n'ont pas la même hauteur (jouée de lucarne, bord de pan)
+  const vquad = (a, b, ya0, ya1, yb0, yb1) => { const g = new THREE.BufferGeometry(), P = [a[0],ya0,a[1], b[0],yb0,b[1], b[0],yb1,b[1], a[0],ya0,a[1], b[0],yb1,b[1], a[0],ya1,a[1]];
+    g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(new Array(12).fill(0), 2)); g.computeVertexNormals(); groups.ceil.add(new THREE.Mesh(g, M.ceil)); };
+  const e = 0.01;
+  for (const p of PANS){
+    const [x0,z0,x1,z1] = p.r, cuts = gridCells(x0, z0, x1, z1, GEO.rooms.flatMap(r => r.poly.map(v => v[0])), GEO.rooms.flatMap(r => r.poly.map(v => v[1])));
+    const xs = [...new Set(cuts.flatMap(c => [c[0], c[2]]))].sort((a,b) => a-b), zs = [...new Set(cuts.flatMap(c => [c[1], c[3]]))].sort((a,b) => a-b);
+    const side = (fixed, along, axis, sgn) => { for (let i = 0; i < along.length-1; i++){ const a = along[i], b = along[i+1], m = (a+b)/2;
+      const P = (u, s) => axis === 'x' ? [fixed + s*e, u] : [u, fixed + s*e], [mxI, mzI] = P(m, -sgn), [mxO, mzO] = P(m, sgn);
+      const po = panAt(mxO, mzO); if (!inRoom(mxI, mzI) || !inRoom(mxO, mzO) || po === p || (po && PANS.indexOf(po) < PANS.indexOf(p))) continue;
+      const fo = cellFn([mxO-e, mzO-e, mxO+e, mzO+e]), hi = (u) => { const [x,z] = P(u, 0); return panH(p, x, z); }, ho = (u) => { const [x,z] = P(u, 0); return fo(x, z); };
+      if (Math.abs(hi(a) - ho(a)) < 0.005 && Math.abs(hi(b) - ho(b)) < 0.005) continue;
+      vquad(P(a, 0), P(b, 0), hi(a), ho(a), hi(b), ho(b)); } };
+    side(x0, zs, 'x', -1); side(x1, zs, 'x', 1); side(z0, xs, 'z', -1); side(z1, xs, 'z', 1);
+  }
+  // fenêtres de toit : embrasure, dormant PVC, vitrage dans le plan du toit (0,28 m au-dessus du plafond)
+  for (const s of SKY){
+    const f = cellFn(s), d = 0.28, w = 0.065, C = [[s[0],s[1]],[s[2],s[1]],[s[2],s[3]],[s[0],s[3]]];
+    for (let i = 0; i < 4; i++){ const a = C[i], b = C[(i+1)%4]; vquad(a, b, f(...a), f(...a) + d, f(...b), f(...b) + d); }
+    hexa([s[0], s[1], s[2], s[3]], (x,z) => f(x,z) + d - 0.012, (x,z) => f(x,z) + d - 0.006, M.glass, groups.ceil);
+    for (const q of [[s[0], s[1], s[2], s[1]+w], [s[0], s[3]-w, s[2], s[3]], [s[0], s[1], s[0]+w, s[3]], [s[2]-w, s[1], s[2], s[3]]]) hexa(q, (x,z) => f(x,z) + d - 0.05, (x,z) => f(x,z) + d, M.pvc, groups.ceil);
+    hexa([(s[0]+s[2])/2 - 0.12, s[1] + w, (s[0]+s[2])/2 + 0.12, s[1] + w + 0.025], (x,z) => f(x,z) + d - 0.075, (x,z) => f(x,z) + d - 0.05, M.dark, groups.ceil);   // barre de manœuvre
+  }
+})();
+
 // ---------- walls (+ dark section caps seen from above, like the poché of a plan)
-for (const w of GEO.walls){ box(w[0], w[1], w[2], w[3], -0.22, TOP, M.wall); box(w[0], w[1], w[2], w[3], TOP, TOP + 0.01, M.cap, groups.caps); }
+for (const w of GEO.walls) solid(w, -0.22, M.wall);
 
 // ---------- windows & openings
 function pane(w, y0, y1, glassMat){               // PVC frame along +x from 0 to w, centred on z = 0
@@ -108,7 +199,7 @@ function pane(w, y0, y1, glassMat){               // PVC frame along +x from 0 t
 function place(obj, a, b){ const dx = b[0]-a[0], dz = b[1]-a[1]; obj.position.set(a[0], 0, a[1]); obj.rotation.y = -Math.atan2(dz, dx); return Math.hypot(dx, dz); }
 for (const o of GEO.openings){
   const [x0,z0,x1,z1] = o.r;
-  box(x0, z0, x1, z1, o.head, TOP, M.wall); box(x0, z0, x1, z1, TOP, TOP+0.01, M.cap, groups.caps);
+  solid(o.r, o.head, o.imposte ? M.door : M.wall);              // imposte : panneau fixe au-dessus d'une porte basse (sous rampant)
   box(x0, z0, x1, z1, -0.22, o.sill || 0, M.wall);
   for (const p of o.panes || []){ const len = Math.hypot(p.b[0]-p.a[0], p.b[1]-p.a[1]), pg = pane(len, p.y0, p.y1, p.frost ? M.frost : M.glass); place(pg, p.a, p.b); groups.walls.add(pg); }
 }
@@ -120,7 +211,7 @@ for (const d of GEO.doors){
   const ac = Math.atan2(d.closed[1]-d.hinge[1], d.closed[0]-d.hinge[0]), ao = Math.atan2(d.open[1]-d.hinge[1], d.open[0]-d.hinge[0]);
   const len = Math.hypot(d.closed[0]-d.hinge[0], d.closed[1]-d.hinge[1]);
   if (d.kind === 'glass') pivot.add(pane(len, 0.02, d.head, M.glass));
-  else { box(0, -0.02, len, 0.02, 0.005, 2.02, d.kind === 'entry' ? M.entry : M.door, pivot);
+  else { box(0, -0.02, len, 0.02, 0.005, d.h ?? 2.02, d.kind === 'entry' ? M.entry : M.door, pivot);
          box(len-0.09, -0.045, len-0.07, 0.045, 0.99, 1.01, M.steel, pivot); }
   groups.walls.add(pivot);
   const dr = {d, pivot, ac, diff: wrapA(ao - ac), len, t: d.isOpen ? 1 : 0, target: d.isOpen ? 1 : 0};
@@ -158,6 +249,15 @@ for (const r of GEO.rails){
   g.add(new THREE.Mesh(mergeGeometries(bars), M.rail)); groups.walls.add(g); railMeshes.push(g);
 }
 for (const p of GEO.posts) box(p[0]-0.04, p[1]-0.06, p[0]+0.04, p[1]+0.06, 0, H, M.post);
+// séparatifs de balcon en lames de bois (hauteur par défaut 1,80 m)
+(function(){
+  const wood = mat(0xa9805a, {roughness:.8}), frame = mat(0x6f5a46, {roughness:.7});
+  for (const sc of GEO.screens || []){
+    const [x0, z0, x1, z1] = sc.r, h = sc.h ?? 1.8, alongX = (x1-x0) >= (z1-z0), L = alongX ? x1-x0 : z1-z0;
+    for (let y = 0.06; y < h - 0.04; y += 0.12) box(x0, z0, x1, z1, y, y + 0.09, wood);
+    for (const u of [0, L - 0.05]) alongX ? box(x0+u, z0, x0+u+0.05, z1, 0, h, frame) : box(x0, z0+u, x1, z0+u+0.05, 0, h, frame);
+  }
+})();
 
 // ---------- kitchen (option Teisseire) : façades sauge, plan chêne, linéaires relevés sur le plan
 const edgeOf = (r, s, d) => { const [x0,z0,x1,z1] = r; return s === 'w' ? [x0,z0,x0+d,z1] : s === 'e' ? [x1-d,z0,x1,z1] : s === 'n' ? [x0,z0,x1,z0+d] : [x0,z1-d,x1,z1]; };
@@ -197,7 +297,10 @@ const OPP = {w:'e', e:'w', n:'s', s:'n'};
   const b = GEO.bath, g = groups.walls;
   const wallPlane = (a, bb, n, y0, y1, m) => { const w = Math.hypot(bb[0]-a[0], bb[1]-a[1]), p = new THREE.Mesh(new THREE.PlaneGeometry(w, y1-y0), m);
     p.position.set((a[0]+bb[0])/2 + n[0]*0.003, (y0+y1)/2, (a[1]+bb[1])/2 + n[1]*0.003); p.rotation.y = Math.atan2(n[0], n[1]);
-    const uv = p.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i)*w, uv.getY(i)*(y1-y0)); g.add(p); return p; };
+    const uv = p.geometry.attributes.uv, ps = p.geometry.attributes.position, ya = Math.min(y1, ceilAt(a[0] + n[0]*0.05, a[1] + n[1]*0.05)), yb2 = Math.min(y1, ceilAt(bb[0] + n[0]*0.05, bb[1] + n[1]*0.05));
+    const toB = n[1]*(bb[0]-a[0]) - n[0]*(bb[1]-a[1]) > 0;          // le +x local de la plaque pointe vers b ?
+    for (let i = 0; i < uv.count; i++){ if (ps.getY(i) > 0){ const t = (uv.getX(i) > 0.5) === toB ? yb2 : ya; ps.setY(i, t - (y0+y1)/2); uv.setY(i, (t - y0)/(y1 - y0)); } }
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i)*w, uv.getY(i)*(y1-y0)); g.add(p); return p; };
   if (b.wc){ const r = b.wc.r, bk = b.wc.back; box(...edgeOf(r, bk, 0.17), 0, 0.82, M.ceramic, g);
     const alongX = bk === 'w' || bk === 'e', cx = (r[0]+r[2])/2, cz = (r[1]+r[3])/2, o = 0.09;
     const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.16, 0.4, 20), M.ceramic);
@@ -217,6 +320,7 @@ const OPP = {w:'e', e:'w', n:'s', s:'n'};
     if (fr === 'n' || fr === 's'){ port.rotation.x = Math.PI/2; port.position.set(cx, 0.5, fr === 'n' ? r[1]-0.005 : r[3]+0.005); } else { port.rotation.z = Math.PI/2; port.position.set(fr === 'w' ? r[0]-0.005 : r[2]+0.005, 0.5, cz); }
     g.add(port); }
   for (const tl of b.tiles || []) wallPlane(tl.a, tl.b, tl.n, 0, H, M.faience);
+  for (const q of b.murets || []) box(q.r[0], q.r[1], q.r[2], q.r[3], 0, q.h, M.faience, g);      // muret faïencé (ex. 0,70 m dans la douche)
   if (b.mirror) wallPlane(b.mirror.a, b.mirror.b, b.mirror.n, b.mirror.y0, b.mirror.y1, M.mirror);
 })();
 
@@ -360,13 +464,13 @@ const FX = { lamps:[], glow:[], ao:[] };
 (function(){
   const g = groups.world;
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), M.ground); ground.rotation.x = -Math.PI/2; ground.position.set(GEO.center[0], GROUND, GEO.center[1]); g.add(ground);
-  for (const b of GEO.mass) box(b[0], b[1], b[2], b[3], GROUND, TOP, M.slab, g);
+  for (const b of GEO.mass) box(b[0], b[1], b[2], b[3], GROUND, b[4] ?? TOP, M.slab, g);   // 5e valeur : hauteur au-dessus du plancher (bâtiment voisin)
   const N = 190, trunkG = new THREE.CylinderGeometry(0.16, 0.26, 1, 7), crownG = new THREE.IcosahedronGeometry(1, 0);
   const gT = [], g1 = [], g2 = [];
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), ps = new THREE.Vector3();
   seed = 42;
   for (let i = 0; i < N; i++){
-    const NV = GEO.north || [0,-1], EV = [-NV[1], NV[0]], FO = GEO.forest; let d, l; if (i < 160){ d = FO.d0 + rnd()*(FO.d1-FO.d0); l = FO.lat0 + rnd()*(FO.lat1-FO.lat0); } else { d = -30 + rnd()*40; l = -(16 + rnd()*30); }
+    const FO = GEO.forest, NV = FO.dir || GEO.north || [0,-1], EV = [-NV[1], NV[0]];  /* FO.dir : côté de la forêt, nord par défaut */ let d, l; if (i < 160){ d = FO.d0 + rnd()*(FO.d1-FO.d0); l = FO.lat0 + rnd()*(FO.lat1-FO.lat0); } else { d = -30 + rnd()*40; l = -(16 + rnd()*30); }
     const x = FO.origin[0] + NV[0]*d + EV[0]*l, z = FO.origin[1] + NV[1]*d + EV[1]*l;
     const h = 13 + rnd()*7, r = 2.2 + rnd()*1.6;
     ps.set(x, GROUND + h/2, z); sc.set(1, h, 1); q.set(0,0,0,1); m4.compose(ps, q, sc); gT.push(trunkG.clone().applyMatrix4(m4));
@@ -478,7 +582,7 @@ const state = { mode:'orbit', ceil:true, kitchen:true, furn:true, layout:'A', sl
 const target = new THREE.Vector3(GEO.center[0], 0.4, GEO.center[1]);
 const keys = new Set(), joy = {x:0, y:0};
 function collide(){
-  const rects = GEO.obst.map(o => o.r).concat(doorRects());
+  const rects = OBST.concat(doorRects());
   for (let pass = 0; pass < 3; pass++) for (const rc of rects){
     const [x0,z0,x1,z1] = rc; const cx = Math.max(x0, Math.min(state.x, x1)), cz = Math.max(z0, Math.min(state.z, z1));
     let dx = state.x - cx, dz = state.z - cz, d = Math.hypot(dx, dz);
@@ -494,9 +598,11 @@ function updateRoom(){
   if (state.mode !== 'visit'){ if (lastRoom !== '') { $('roomName').textContent = "Vue d'ensemble"; $('roomArea').textContent = META.overview; lastRoom = ''; } return; }
   const r = GEO.rooms.find(r => inPoly(state.x, state.z, r.poly)); const name = r ? r.name : 'Seuil';
   const so = SOFF.find(s => state.x > s.r[0] && state.x < s.r[2] && state.z > s.r[1] && state.z < s.r[3]);
-  const key = name + (so ? so.h : ''); if (key === lastRoom) return; lastRoom = key;
-  $('roomName').textContent = name; $('roomArea').textContent = r ? fmt(r.plan) + ' m²' : '';
-  $('hsp').textContent = r && r.floor === 'deck' ? 'Balcon couvert · garde-corps 1,00 m' : so ? 'Sous soffite : ' + fmtM(so.h) + ' m' : 'Sous plafond : ' + fmtM(GEO.ceiling) + ' m';
+  const pn = panAt(state.x, state.z), ch = ceilAt(state.x, state.z), slopeHere = pn && ch < (pn.cap ?? H) - 0.005;
+  const key = name + (so ? so.h : '') + '|' + ch.toFixed(2); if (key === lastRoom) return; lastRoom = key;
+  $('roomName').textContent = name; $('roomArea').textContent = r ? fmt(r.plan) + ' m²' + (r.low ? ' + ' + fmt(r.low) + ' m² sous 1,80 m' : '') : '';
+  $('hsp').textContent = r && r.floor === 'deck' ? 'Balcon couvert · garde-corps 1,00 m' : so ? 'Sous soffite : ' + fmtM(so.h) + ' m'
+    : slopeHere ? 'Sous rampant : ' + fmtM(ch) + ' m (' + fmtM(pn.h0) + ' → ' + fmtM(pn.cap ?? H) + ' m)' : 'Sous plafond : ' + fmtM(ch) + ' m';
   document.querySelectorAll('#chips button').forEach(b => b.classList.toggle('here', name.startsWith(b.dataset.room) || (b.dataset.room === 'Séjour' && name.startsWith('Séjour'))));
 }
 
@@ -516,7 +622,7 @@ function setMode(m){
 }
 function goTo(name){
   const v = (state.layout === 'B' && GEO.viewsB && GEO.viewsB[name]) || GEO.views[name]; state.visited = true; state.x = v.p[0]; state.z = v.p[1];
-  state.yaw = Math.atan2(-(v.look[0]-v.p[0]), -(v.look[1]-v.p[1])); state.pitch = -0.06;
+  state.yaw = Math.atan2(-(v.look[0]-v.p[0]), -(v.look[1]-v.p[1])); state.pitch = v.pitch ?? -0.06;
   if (state.mode !== 'visit') setMode('visit'); lastRoom = null; updateRoom();
 }
 const chips = $('chips');
@@ -578,6 +684,7 @@ function drawMini(){
   const cs = getComputedStyle(document.documentElement), ink = cs.getPropertyValue('--ink').trim(), acc = cs.getPropertyValue('--accent').trim(), chip = cs.getPropertyValue('--chip').trim();
   const {s, ox, oz} = miniXf(); mg.setTransform(dpr,0,0,dpr,0,0); mg.clearRect(0,0,w,h);
   for (const r of GEO.rooms){ mg.beginPath(); r.poly.forEach(([x,z],i) => i ? mg.lineTo(ox+x*s, oz+z*s) : mg.moveTo(ox+x*s, oz+z*s)); mg.closePath(); mg.fillStyle = r.ext ? 'rgba(214,176,92,.35)' : chip; mg.fill(); }
+  mg.fillStyle = 'rgba(184,106,75,.3)'; for (const c of LOWCELLS) mg.fillRect(ox+c[0]*s, oz+c[1]*s, (c[2]-c[0])*s, (c[3]-c[1])*s);
   mg.fillStyle = ink; for (const wl of GEO.walls) mg.fillRect(ox+wl[0]*s, oz+wl[1]*s, (wl[2]-wl[0])*s, (wl[3]-wl[1])*s);
   if (state.furn){ mg.strokeStyle = cs.getPropertyValue('--muted').trim(); mg.lineWidth = 1;
     for (const f of GEO.furn){ if (f.nomap || (f.layout && f.layout !== state.layout)) continue; if (f.r) mg.strokeRect(ox+f.r[0]*s, oz+f.r[1]*s, (f.r[2]-f.r[0])*s, (f.r[3]-f.r[1])*s); else { mg.beginPath(); mg.arc(ox+f.c[0]*s, oz+f.c[1]*s, (f.rad || 0.2)*s, 0, 7); mg.stroke(); } } }

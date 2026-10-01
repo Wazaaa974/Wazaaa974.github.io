@@ -1,3 +1,4 @@
 node_modules/
 _src/node_modules/
 _src/out/
+__pycache__/

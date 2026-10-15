@@ -1,194 +1,438 @@
-<!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
-  <title>Thomas Alonso – Portfolio</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      transition: background-color 0.3s, color 0.3s;
-      background: linear-gradient(-45deg, #1e1e2f, #1f3b4d, #2c5364, #1e202e);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      color: #f0f0f0;
-    }
-    [data-theme="dark"] {
-      background-color: #121212;
-      color: #f0f0f0;
-    }
-    .profile-img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 3px solid #0077cc;
-      margin-bottom: 1rem;
-      transition: transform 0.3s;
-    }
-    .profile-img:hover {
-      transform: scale(1.05);
-    }
-    .project:hover {
-      background-color: rgba(0, 119, 204, 0.05);
-    }
-    .fade-in {
-      animation: fadeIn 1s ease-in forwards;
-      opacity: 0;
-    }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 999;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thomas Alonso — carnet</title>
+<meta name="description" content="Carnet de Thomas Alonso : ingénieur de formation, développeur par curiosité. Parcours, prototypes Rails et maquettes 3D d'appartements.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Thomas Alonso — carnet">
+<meta property="og:description" content="Ingénieur de formation, développeur par curiosité. Prototypes, données industrielles et maquettes 3D.">
+<meta property="og:image" content="https://wazaaa974.github.io/lab/plante-io-poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3EEE4;--paper-2:#EAE3D6;--ink:#15191A;--muted:#5E6663;
+  --line:rgba(21,25,26,.14);--accent:#E0542C;--accent-ink:#fff;--teal:#1d7a76;
+  --grain:.05;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --rule:72px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#121615;--paper-2:#1A201E;--ink:#ECE7DC;--muted:#9AA39E;--line:rgba(236,231,220,.14);--teal:#5cc6c1;--grain:.07}
+}
+:root[data-theme="dark"]{--paper:#121615;--paper-2:#1A201E;--ink:#ECE7DC;--muted:#9AA39E;--line:rgba(236,231,220,.14);--teal:#5cc6c1;--grain:.07}
 
-        /* Loader styles */
-    #loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #121212;
-      z-index: 9999;
-      transition: opacity 0.8s ease;
-    }
-    body.loading #loader {
-      opacity: 1;
-    }
-    body.loaded #loader {
-      opacity: 0;
-      pointer-events: none;
-    }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.2 -.1'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
+img,video{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+::selection{background:var(--accent);color:#fff}
 
+.mono,.label{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:500}
+.label{color:var(--muted);display:block}
+h1,h2,h3{font-family:var(--serif);font-weight:500;font-variation-settings:"opsz" 144;margin:0;letter-spacing:-.015em}
+em{font-style:italic}
 
+/* ---------- layout ---------- */
+.wrap{position:relative;max-width:1120px;margin:0 auto;padding:0 16px}
+@media(min-width:761px){
+  .wrap{padding:0 32px 0 calc(var(--rule) + 32px)}
+  .wrap::before{content:"";position:absolute;top:0;bottom:0;left:var(--rule);width:1px;background:var(--line)}
+}
+section{position:relative;padding:clamp(72px,11vw,140px) 0 0}
+.sec-head{margin-bottom:clamp(32px,5vw,56px)}
+.sec-head .label{margin-bottom:14px}
+.sec-head h2{font-size:clamp(36px,5.6vw,64px);line-height:1.02}
+@media(min-width:761px){
+  .sec-head .label{position:relative}
+  .sec-head .label::before{content:"";position:absolute;left:-32px;top:50%;width:32px;height:1px;background:var(--ink);opacity:.5}
+}
 
-  </style>
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 82%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav .in-nav{max-width:1120px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px}
+.brand{font-family:var(--serif);font-size:21px;text-decoration:none;font-weight:500;letter-spacing:-.01em;margin-right:auto}
+.nav-links{display:flex;gap:clamp(12px,2.2vw,28px);order:3;width:100%;justify-content:space-between;padding-bottom:2px}
+.nav-links a{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:8px 0;transition:color .2s}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a:hover{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:6px;text-decoration-thickness:2px}
+.theme{order:2;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid var(--line);border-radius:50%;color:var(--ink);cursor:pointer;padding:0;transition:border-color .2s}
+.theme:hover{border-color:var(--ink)}
+.theme svg{width:20px;height:20px;grid-area:1/1}
+.theme .sun{display:none}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme .sun{display:block}:root:not([data-theme="light"]) .theme .moon{display:none}}
+:root[data-theme="dark"] .theme .sun{display:block}
+:root[data-theme="dark"] .theme .moon{display:none}
+@media(min-width:761px){
+  .nav .in-nav{flex-wrap:nowrap;padding:14px 32px}
+  .nav-links{order:2;width:auto;gap:28px;padding:0}
+  .theme{order:3}
+}
+
+@media(max-width:380px){.nav-links a{font-size:10px;letter-spacing:.06em}.nav-links{gap:8px}}
+/* ---------- hero ---------- */
+.hero{padding-top:clamp(40px,6vw,88px)}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:36px}
+.hero .label{margin-bottom:22px}
+h1{font-size:clamp(44px,8vw,96px);line-height:.98;letter-spacing:-.025em;font-variation-settings:"opsz" 144}
+h1 span{display:block}
+h1 em{color:var(--accent);white-space:nowrap}
+.lede{font-size:19px;line-height:1.6;max-width:56ch;margin:clamp(24px,3.5vw,40px) 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0 0;padding:0;list-style:none}
+.chips li{font:500 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--paper-2) 60%,transparent)}
+.portrait{margin:0;justify-self:start;width:min(78%,300px)}
+.portrait .frame{transform:rotate(-2deg);border-radius:18px;overflow:hidden;box-shadow:0 18px 40px -14px rgba(21,25,26,.35),0 3px 8px rgba(21,25,26,.12);background:var(--paper-2);aspect-ratio:796/900}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.portrait figcaption{margin-top:18px;color:var(--muted);transform:rotate(-2deg);transform-origin:left top;font-size:10.5px;letter-spacing:.1em}
+@media(min-width:761px){
+  .hero-grid{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:0}
+  .hero-text{grid-column:1/9;grid-row:1;position:relative;z-index:2}
+  .portrait{grid-column:9/13;grid-row:1;width:auto;justify-self:stretch;margin:clamp(20px,3vw,44px) 0 0 -2vw;position:relative;z-index:1}
+}
+@media(min-width:761px) and (max-width:1000px){.hero-text{grid-column:1/9}.portrait{grid-column:9/13;margin-left:0}}
+
+/* ---------- parcours ---------- */
+.parcours-grid{display:grid;gap:40px}
+.timeline{position:relative;margin:0;padding:0 0 0 30px;list-style:none}
+.timeline::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.step{position:relative;padding:0 0 clamp(32px,4.5vw,52px)}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:-30px;top:.5em;width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px var(--paper)}
+.step .yr{display:block;color:var(--muted);margin-bottom:6px}
+.step h3{font-size:clamp(24px,3vw,32px);line-height:1.12;margin-bottom:8px}
+.step p{margin:0;max-width:54ch;color:color-mix(in srgb,var(--ink) 86%,var(--paper))}
+.step:nth-child(even){padding-left:0}
+.aside{background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:22px 22px 24px;position:relative}
+.aside::after{content:"";position:absolute;top:-1px;right:18px;width:46px;height:14px;background:var(--accent);opacity:.9;transform:translateY(-50%) rotate(-3deg);border-radius:1px}
+.aside .label{margin-bottom:10px;color:var(--accent)}
+.aside p{margin:0;font-family:var(--serif);font-size:20px;line-height:1.35;font-variation-settings:"opsz" 36}
+@media(min-width:761px){
+  .parcours-grid{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
+  .timeline{grid-column:1/9;padding-left:0}
+  .timeline::before{display:none}
+  .step{padding-left:0}
+  .step::before{left:-37px;top:.35em}
+  .step .yr{position:absolute;left:-104px;width:56px;text-align:right;top:.3em;margin:0}
+  .step:nth-child(2){margin-left:0}
+  .aside{grid-column:9/13;align-self:start;margin-top:72px;transform:rotate(1.2deg)}
+}
+@media(min-width:761px) and (max-width:900px){.timeline{grid-column:1/13}.aside{grid-column:1/13;margin-top:8px;max-width:420px;transform:none}}
+
+/* ---------- laboratoire ---------- */
+.intro{max-width:60ch;margin:0 0 clamp(36px,5vw,64px);font-size:18px;color:color-mix(in srgb,var(--ink) 86%,var(--paper))}
+.boards{display:grid;gap:clamp(44px,6vw,72px) 32px;grid-template-columns:minmax(0,1fr)}
+.vframe{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9;cursor:pointer;box-shadow:0 14px 34px -18px rgba(21,25,26,.45)}
+.vframe video{width:100%;height:100%;object-fit:cover}
+.vbtn{position:absolute;right:12px;bottom:12px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(18,22,21,.72);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .2s}
+.vbtn:hover{background:rgba(18,22,21,.92)}
+.vbtn svg{width:20px;height:20px;grid-area:1/1}
+.vbtn .off{display:none}
+.vframe[data-muted="false"] .vbtn .on{display:none}
+.vframe[data-muted="false"] .vbtn .off{display:block}
+.vplay{position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:8px;padding:8px 12px 8px 10px;border-radius:999px;background:rgba(18,22,21,.72);color:#fff;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;pointer-events:none;transition:opacity .3s}
+.vplay svg{width:14px;height:14px}
+.vframe.playing .vplay{opacity:0}
+.board-text{display:grid;gap:10px;margin-top:22px}
+.board-text .n{color:var(--accent)}
+.board h3{font-size:clamp(30px,4vw,44px);line-height:1.05}
+.pitch{margin:0;max-width:52ch;color:color-mix(in srgb,var(--ink) 88%,var(--paper))}
+.stack{color:var(--muted);margin:2px 0 0;font-size:11px;letter-spacing:.1em}
+.links{margin:4px 0 0}
+.lnk{font-family:var(--sans);font-weight:500;font-size:16px;text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:5px}
+.lnk:hover{color:var(--accent)}
+.priv{color:var(--muted)}
+@media(min-width:761px){
+  .boards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .board:nth-child(1){grid-column:1/-1}
+  .board:nth-child(1) .board-text{grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:32px;row-gap:10px;align-items:start}
+  .board:nth-child(1) .board-text .n,.board:nth-child(1) h3{grid-column:1}
+  .board:nth-child(1) .pitch,.board:nth-child(1) .stack,.board:nth-child(1) .links{grid-column:2}
+  .board:nth-child(1) .n{grid-row:1}.board:nth-child(1) h3{grid-row:2/5}
+  .board:nth-child(1) .pitch{grid-row:1/3}.board:nth-child(1) .stack{grid-row:3}.board:nth-child(1) .links{grid-row:4}
+  .board:nth-child(3){margin-top:56px}
+}
+
+/* ---------- projections ---------- */
+.proj{--c:var(--teal)}
+.proj .sec-head h2{color:var(--teal)}
+.proj .sec-head .label{color:var(--teal)}
+.proj-text{max-width:62ch;margin:0 0 clamp(28px,4vw,44px);font-size:18px}
+.strip-wrap{position:relative;margin:0 -16px}
+.strip{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;padding:6px 16px 20px;scrollbar-width:thin;scrollbar-color:var(--teal) transparent;-webkit-overflow-scrolling:touch}
+.strip::-webkit-scrollbar{height:6px}
+.strip::-webkit-scrollbar-thumb{background:var(--teal);border-radius:3px}
+.strip li{flex:0 0 clamp(250px,72vw,340px);scroll-snap-align:start;list-style:none}
+.strip{margin:0;list-style:none}
+.strip a{display:block;text-decoration:none}
+.strip .ph{aspect-ratio:1200/630;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--paper-2);transition:border-color .2s,transform .2s var(--ease)}
+.strip img{width:100%;height:100%;object-fit:cover}
+.strip a:hover .ph{border-color:var(--teal)}
+.strip .cap{display:block;margin-top:10px;color:var(--muted)}
+.strip a:hover .cap{color:var(--teal)}
+.proj-foot{display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px;margin-top:20px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:500 15px/1 var(--sans);text-decoration:none;padding:14px 22px;border-radius:999px;border:1.5px solid var(--ink);color:var(--ink);background:transparent;transition:background .2s,color .2s,border-color .2s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.proj .btn{border-color:var(--teal);color:var(--teal)}
+.proj .btn:hover{background:var(--teal);color:var(--paper)}
+.proj-foot .mono{color:var(--muted);font-size:11px;letter-spacing:.1em}
+@media(min-width:761px){.strip-wrap{margin:0 calc(-1*max(32px,(100vw - 1120px)/2 + 32px)) 0 0}.strip{padding-left:0;padding-right:48px}}
+
+/* ---------- contact ---------- */
+.contact h2{font-size:clamp(48px,9vw,120px);line-height:.95;letter-spacing:-.03em}
+.contact p{max-width:46ch;font-size:19px;margin:24px 0 32px}
+.contact .btns{display:flex;flex-wrap:wrap;gap:12px}
+footer{padding:clamp(72px,10vw,120px) 0 40px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;padding-top:20px}
+footer .wrap::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--line)}
+footer .mono{color:var(--muted);font-size:11px;letter-spacing:.1em}
+footer a{text-underline-offset:4px}
+@media(min-width:761px){footer .wrap::after{left:32px;right:32px}}
+
+/* ---------- motion ---------- */
+.js .rv{opacity:0;transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--d,0)*1ms)}
+.js .rv.in{opacity:1}
+.js h1 .rv{transform:translateY(22px)}
+.js .portrait.rv{transform:translateY(12px)}
+.js h1 .rv.in,.js .portrait.rv.in{transform:none}
+.js .pr{clip-path:inset(0 100% 0 0);transition:clip-path .6s steps(14,end);transition-delay:calc(var(--d,0)*1ms)}
+.js .pr.in{clip-path:inset(-4px -40px -4px -40px)}
+.js .sec-head .label::before{transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease) .2s}
+.js .sec-head .label.pr.in::before{transform:none}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .rv,.js .pr,.js .sec-head .label::before{opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important}
+}
+</style>
 </head>
-<body class="container py-5 fade-in">
+<body>
 
-    <!-- Loader -->
-  <div id="loader" class="d-flex justify-content-center align-items-center">
-    <h1 class="text-white">Loading...</h1>
+<header class="nav">
+  <div class="in-nav">
+    <a class="brand" href="#top">Thomas Alonso</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#parcours">Parcours</a><a href="#laboratoire">Laboratoire</a><a href="#projections">Projections</a><a href="#contact">Contact</a>
+    </nav>
+    <button class="theme" id="theme" type="button" aria-label="Changer de thème clair ou sombre">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+    </button>
   </div>
+</header>
 
+<main id="top" class="wrap">
 
-  <button class="btn btn-sm btn-outline-secondary theme-toggle">🌓 Mode sombre</button>
-
-  <div class="text-center mb-5">
-    <img src="images/me.JPG" alt="Photo de profil" class="profile-img" />
-    <h1 class="mb-2">Salut, moi c’es 👋</h1>
-
-    <!-- Typing effect section -->
-    <h2 class="fw-light" style="height: 2.5rem;">
-      Je suis <span id="typewriter" class="text-white"></span>
-    </h2>
-  </div>
-
-  <section class="mb-5">
-    <h2>À propos</h2>
-    <p>
-      J’ai étudié la pétrochimie et commencé ma carrière aux Pays-Bas, où j’ai travaillé plusieurs années comme ingénieur.
-      En 2024, j’ai décidé de tout quitter pour me reconvertir dans le développement web à Bordeaux via la formation Le Wagon.
-    </p>
-    <p>
-      Aujourd’hui, j’utilise ma rigueur scientifique et mon goût pour le design pour créer des applications web utiles, élégantes et efficaces.
-    </p>
-  </section>
-
-  <section class="mb-5">
-    <h2>Projets</h2>
-
-    <div class="project p-3 rounded shadow-sm mb-3">
-      <h4><a href="https://www.klorys.re/" target="_blank">L.O.ve – Observatoire Végétal</a></h4>
-      <p>
-        Une base de données botanique pour l’île de La Réunion. Ce projet aide les pépinières à identifier les espèces endémiques et exotiques.
-        Un projet tech au service de la biodiversité.
-      </p>
-    </div>
-
-    <div class="project p-3 rounded shadow-sm mb-3">
-      <h4><a href="https://nestify.pics" target="_blank">Nestify</a></h4>
-      <p>
-        Une application intelligente qui propose des ensembles de meubles assortis à partir de données récupérées en ligne.
-        Créé en équipe pendant Le Wagon.
-      </p>
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <span class="label pr" style="--d:100">Bordeaux · 2026</span>
+        <h1>
+          <span class="rv" style="--d:150">Ingénieur</span>
+          <span class="rv" style="--d:290">de formation,</span>
+          <span class="rv" style="--d:430">développeur <em>par curiosité</em>.</span>
+        </h1>
+        <p class="lede rv" style="--d:620">J'ai passé dix ans à faire tourner des procédés chimiques. Aujourd'hui je construis des outils : des données, du code, et des petites applications qui règlent de vrais problèmes. Cette page est mon carnet.</p>
+        <ul class="chips rv" style="--d:760">
+          <li>Chimie → Data → Web</li><li>Rotterdam → Bordeaux</li><li>La Réunion au cœur</li>
+        </ul>
+      </div>
+      <figure class="portrait rv" style="--d:380">
+        <div class="frame"><img src="images/thomas.jpg" width="796" height="900" alt="Portrait de Thomas Alonso, souriant, polo bordeaux"></div>
+        <figcaption class="mono pr" style="--d:900">Fig. 1 — l'auteur, Chartrons, Bordeaux</figcaption>
+      </figure>
     </div>
   </section>
 
-  <footer class="mt-5 text-center">
-    <p class="text-muted">Conçu avec 💻 par Thomas Alonso · <a href="https://github.com/Wazaaa974" target="_blank">GitHub</a> · <a href="https://www.linkedin.com/in/thomasalonsoifp/" target="_blank">LinkedIn</a></p>
-  </footer>
+  <section id="parcours">
+    <div class="sec-head">
+      <span class="label pr">01 — D'où je viens</span>
+      <h2>Le parcours</h2>
+    </div>
+    <div class="parcours-grid">
+      <ol class="timeline">
+        <li class="step"><span class="yr mono">2010 →</span><h3>Nancy, puis l'IFP</h3><p>Ingénieur chimiste (ENSIC Nancy), spécialisé procédés à l'IFP School. J'aime comprendre comment les choses fonctionnent, vraiment.</p></li>
+        <li class="step"><span class="yr mono">2016 →</span><h3>Rotterdam, six ans</h3><p>LyondellBasell, programme Emerging Leader : ingénieur procédés, mise en service d'unités, planification supply, puis responsable des opérations commerciales. Six ans aux Pays-Bas, à apprendre à décider avec des données.</p></li>
+        <li class="step"><span class="yr mono">2024</span><h3>Le Wagon, Bordeaux</h3><p>Bootcamp développement web : Ruby on Rails, JavaScript, et le plaisir de livrer quelque chose qu'on peut utiliser le soir même.</p></li>
+        <li class="step"><span class="yr mono">2025 →</span><h3>Michelin, Bassens</h3><p>Senior Data Analyst sur les sites de caoutchouc synthétique : pipelines, dashboards, qualité de données, et un peu d'IA générative pour les équipes.</p></li>
+      </ol>
+      <aside class="aside">
+        <span class="label">La Réunion</span>
+        <p>Mon île. J'y ai mes racines, ma famille, et l'idée de Klorys.</p>
+      </aside>
+    </div>
+  </section>
 
-  <!-- JavaScript -->
-  <script>
-    // Page loading effect
-  document.body.classList.add("loading");
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      document.body.classList.remove("loading");
-      document.body.classList.add("loaded");
-    }, 1500); // Adjust delay (in ms) here
+  <section id="laboratoire">
+    <div class="sec-head">
+      <span class="label pr">02 — Ce que je fabrique</span>
+      <h2>Le laboratoire</h2>
+    </div>
+    <p class="intro">Trois prototypes, trois vidéos de vingt secondes. Chaque vidéo est générée en code à partir de vraies captures de l'application, avec sa propre musique synthétisée.</p>
+    <div class="boards">
+
+      <article class="board">
+        <div class="vframe" data-muted="true">
+          <video src="lab/klorys.mp4" poster="lab/klorys-poster.jpg" playsinline muted loop preload="metadata" controls aria-label="Démonstration vidéo de Klorys"></video>
+          <span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>Lecture</span>
+          <button class="vbtn" type="button" aria-label="Activer ou couper le son de la vidéo Klorys">
+            <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+            <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>
+          </button>
+        </div>
+        <div class="board-text">
+          <span class="n mono">N° 01</span>
+          <h3>Klorys</h3>
+          <p class="pitch">Le catalogue botanique de La Réunion : plus de 1 000 espèces, endémiques, indigènes ou exotiques, cherchables en un instant. Pensé pour les paysagistes et les pépinières.</p>
+          <p class="stack mono">Ruby on Rails · PostgreSQL · Algolia</p>
+          <p class="links"><a class="lnk" href="https://www.klorys.re/" rel="noopener">Voir le site →</a></p>
+        </div>
+      </article>
+
+      <article class="board">
+        <div class="vframe" data-muted="true">
+          <video src="lab/get-together.mp4" poster="lab/get-together-poster.jpg" playsinline muted loop preload="metadata" controls aria-label="Démonstration vidéo de Get Together"></video>
+          <span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>Lecture</span>
+          <button class="vbtn" type="button" aria-label="Activer ou couper le son de la vidéo Get Together">
+            <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+            <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>
+          </button>
+        </div>
+        <div class="board-text">
+          <span class="n mono">N° 02</span>
+          <h3>Get Together</h3>
+          <p class="pitch">Trois amis, trois villes : l'app compare les vrais prix de vols et trouve la ville la moins chère pour tout le monde.</p>
+          <p class="stack mono">Rails 8 · Hotwire · Duffel API · Mapbox</p>
+          <p class="links"><a class="lnk" href="https://github.com/Wazaaa974/get_together" rel="noopener">Code →</a></p>
+        </div>
+      </article>
+
+      <article class="board">
+        <div class="vframe" data-muted="true">
+          <video src="lab/plante-io.mp4" poster="lab/plante-io-poster.jpg" playsinline muted loop preload="metadata" controls aria-label="Démonstration vidéo de plante.io"></video>
+          <span class="vplay" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>Lecture</span>
+          <button class="vbtn" type="button" aria-label="Activer ou couper le son de la vidéo plante.io">
+            <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+            <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>
+          </button>
+        </div>
+        <div class="board-text">
+          <span class="n mono">N° 03</span>
+          <h3>plante.io</h3>
+          <p class="pitch">Un journal de croissance pour plantes d'intérieur : photos, soins, XP et stades. Mes vraies plantes servent de cobayes.</p>
+          <p class="stack mono">Rails 8 · Active Storage · Tailwind</p>
+          <p class="links priv mono">prototype privé</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="projections" class="proj">
+    <div class="sec-head">
+      <span class="label pr">03 — Maquettes 3D</span>
+      <h2>Je me projette</h2>
+    </div>
+    <p class="proj-text">En cherchant un appartement, j'ai voulu voir les plans de vente autrement. J'ai donc écrit un moteur qui transforme un plan PDF en maquette 3D visitable dans le navigateur, avec l'ensoleillement réel selon l'orientation. Huit lots du programme Cap Ouest (Carcans) sont en ligne.</p>
+    <div class="strip-wrap">
+      <ul class="strip" tabindex="0" aria-label="Maquettes 3D des lots Cap Ouest, défilement horizontal">
+        <li><a href="maquettes/v2/cap-ouest-a105.html"><div class="ph"><img src="maquettes/v2/cap-ouest-a105.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot A105, programme Cap Ouest"></div><span class="cap mono">Lot A105</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-a106.html"><div class="ph"><img src="maquettes/v2/cap-ouest-a106.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot A106, programme Cap Ouest"></div><span class="cap mono">Lot A106</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-a201.html"><div class="ph"><img src="maquettes/v2/cap-ouest-a201.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot A201, programme Cap Ouest"></div><span class="cap mono">Lot A201</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-a206.html"><div class="ph"><img src="maquettes/v2/cap-ouest-a206.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot A206, programme Cap Ouest"></div><span class="cap mono">Lot A206</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-a301.html"><div class="ph"><img src="maquettes/v2/cap-ouest-a301.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot A301, programme Cap Ouest"></div><span class="cap mono">Lot A301</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-b205.html"><div class="ph"><img src="maquettes/v2/cap-ouest-b205.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot B205, programme Cap Ouest"></div><span class="cap mono">Lot B205</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-c105.html"><div class="ph"><img src="maquettes/v2/cap-ouest-c105.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot C105, programme Cap Ouest"></div><span class="cap mono">Lot C105</span></a></li>
+        <li><a href="maquettes/v2/cap-ouest-c205.html"><div class="ph"><img src="maquettes/v2/cap-ouest-c205.jpg" width="1200" height="630" loading="lazy" alt="Maquette 3D du lot C205, programme Cap Ouest"></div><span class="cap mono">Lot C205</span></a></li>
+      </ul>
+    </div>
+    <div class="proj-foot">
+      <a class="btn" href="maquettes/v2/">Ouvrir les maquettes →</a>
+      <span class="mono">Moteur maison · Three.js · calcul solaire USNO</span>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <h2>On se parle&nbsp;?</h2>
+    <p>Je suis preneur d'un échange sur la data industrielle, Rails, ou une idée à prototyper.</p>
+    <div class="btns">
+      <a class="btn" href="https://www.linkedin.com/in/thomasalonsoifp/" rel="noopener">LinkedIn</a>
+      <a class="btn" href="https://github.com/Wazaaa974" rel="noopener">GitHub</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">Conçu et codé par Thomas Alonso · Bordeaux · 2026</span>
+    <a class="mono" href="maquettes/">maquettes</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  /* thème */
+  var btn=document.getElementById('theme');
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur)cur=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('theme',next)}catch(e){}
   });
 
-
-    const toggleBtn = document.querySelector('.theme-toggle');
-    toggleBtn.addEventListener('click', () => {
-      const html = document.documentElement;
-      html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+  /* entrée */
+  var els=document.querySelectorAll('.rv,.pr');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){if(e.target.classList.contains('rv'))e.target.classList.add('in');(e.target._t||[]).forEach(function(t){t.classList.add('in')});io.unobserve(e.target)}})},{threshold:.15});
+    els.forEach(function(el){
+      /* un élément rogné (clip-path) n'est jamais « visible » : on observe son parent */
+      if(el.classList.contains('pr')){var p=el.parentElement;(p._t=p._t||[]).push(el);io.observe(p)}
+      else io.observe(el);
     });
+  }else{els.forEach(function(el){el.classList.add('in')})}
 
-    const target = document.getElementById("typewriter");
-    const phrases = [
-      { text: "ingénieur chimiste", strike: true },
-      { text: "développeur web", strike: false }
-    ];
-
-    let step = 0;
-    let letterIndex = 0;
-    let typingSpeed = 80;
-    let isDeleting = false;
-
-    function type() {
-      let currentPhrase = phrases[step];
-      let displayText = currentPhrase.text.slice(0, letterIndex);
-
-      if (currentPhrase.strike) {
-        target.innerHTML = `<s>${displayText}</s>`;
-      } else {
-        target.textContent = displayText;
-      }
-
-      if (!isDeleting && letterIndex < currentPhrase.text.length) {
-        letterIndex++;
-        setTimeout(type, typingSpeed);
-      } else if (!isDeleting && letterIndex === currentPhrase.text.length) {
-        isDeleting = true;
-        setTimeout(type, 1000);
-      } else if (isDeleting && letterIndex > 0) {
-        letterIndex--;
-        setTimeout(type, 50);
-      } else if (isDeleting && letterIndex === 0) {
-        isDeleting = false;
-        step = (step + 1) % phrases.length;
-        setTimeout(type, 500);
-      }
+  /* vidéos */
+  var frames=document.querySelectorAll('.vframe');
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canHover=matchMedia('(hover:hover)').matches;
+  frames.forEach(function(f){
+    var v=f.querySelector('video'),b=f.querySelector('.vbtn'),pinned=false;
+    v.removeAttribute('controls');v.muted=true;
+    function play(){var p=v.play();if(p&&p.catch)p.catch(function(){})}
+    v.addEventListener('play',function(){f.classList.add('playing')});
+    v.addEventListener('pause',function(){f.classList.remove('playing')});
+    if(canHover&&!reduce){
+      f.addEventListener('mouseenter',play);
+      f.addEventListener('mouseleave',function(){if(!pinned)v.pause()});
     }
-
-    type();
-
-  </script>
-
+    f.addEventListener('click',function(e){
+      if(e.target.closest('.vbtn'))return;
+      if(v.paused){pinned=true;play()}else{pinned=false;v.pause()}
+    });
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      v.muted=!v.muted;f.setAttribute('data-muted',v.muted?'true':'false');
+      if(!v.muted){pinned=true;play()}
+    });
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting&&!v.paused){v.pause();pinned=false}})},{threshold:.1}).observe(f);
+    }
+  });
+})();
+</script>
 </body>
 </html>
